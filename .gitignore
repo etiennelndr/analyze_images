@@ -102,6 +102,13 @@ venv.bak/
 
 # mypy
 .mypy_cache/
+
+# Images
 *.jpg
+*.png
+datas/**
+
+# Visual Studio project files
 *.pyproj
 *.sln
+src/.vs/src/v15/.suo
