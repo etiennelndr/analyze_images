@@ -113,3 +113,5 @@ datas/**
 *.sln
 src/.vs/src/v15/.suo
 *.TMP
+*.hdf5
+*.json
