@@ -32,8 +32,8 @@ class AnimalsModel(NNModel):
         """
         Creates each layer of the model.
         """
-        #base_dir  = "C:/Users/e_sgouge/Documents/Etienne/Python/UtilisationCNN/datas/dogs_vs_cats"
-        base_dir  = "D:/Documents/Programmation/Python/UtilisationCNN/datas/dogs_vs_cats"
+        base_dir  = "C:/Users/e_sgouge/Documents/Etienne/Python/analyze_images/datas/dogs_vs_cats"
+        #base_dir  = "D:/Documents/Programmation/Python/UtilisationCNN/datas/dogs_vs_cats"
         train_dir = join(base_dir, "training")
         val_dir   = join(base_dir, "validation")
         test_dir  = join(base_dir, "testing")

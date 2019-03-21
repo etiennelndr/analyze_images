@@ -19,7 +19,7 @@ try:
 
     from PIL import Image, ImageQt
 
-    # Importing the required Keras modules containing model and layers
+    # Importing keras
     from keras import backend as K
 
     # In our case we're using the GPU which is faster than the CPU

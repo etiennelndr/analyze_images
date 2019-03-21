@@ -52,8 +52,8 @@ class RoadsModel(NNModel):
         """
         Create each layer of the model.
         """
-        #base_dir  = "C:/Users/e_sgouge/Documents/Etienne/Python/UtilisationCNN/datas/data_road"
-        base_dir = "D:/Documents/Programmation/Python/UtilisationCNN/datas/data_road"
+        base_dir  = "C:/Users/e_sgouge/Documents/Etienne/Python/analyze_images/datas/data_road"
+        #base_dir = "D:/Documents/Programmation/Python/UtilisationCNN/datas/data_road"
         train_dir = join(base_dir, "training")
         val_dir   = join(base_dir, "validation")
 

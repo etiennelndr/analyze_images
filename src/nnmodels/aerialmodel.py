@@ -25,8 +25,8 @@ class AerialModel(NNModel):
         """
         Creates each layer of the model.
         """
-        #base_dir  = "C:/Users/e_sgouge/Documents/Etienne/Python/UtilisationCNN/datas/aerial_images"
-        base_dir  = "D:/Documents/Programmation/Python/UtilisationCNN/datas/aerial_images"
+        base_dir  = "C:/Users/e_sgouge/Documents/Etienne/Python/analyze_images/datas/aerial_images"
+        #base_dir  = "D:/Documents/Programmation/Python/UtilisationCNN/datas/aerial_images"
         train_dir = join(base_dir, "training")
         val_dir   = join(base_dir, "validation")
 
