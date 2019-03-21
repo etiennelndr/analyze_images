@@ -218,14 +218,6 @@ class MainWindow(QMainWindow):
         else:
             event.ignore()
 
-    def __binarize_array(self, numpy_array, threshold=50):
-        """
-        Binarizes a numpy array.
-        """
-        numpy_array[numpy_array >  threshold] = 15
-        numpy_array[numpy_array <= threshold] = 240
-        return numpy_array
-
     @pyqtSlot()
     def useConsole(self, checkBox):
         """
