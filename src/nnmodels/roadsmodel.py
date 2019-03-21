@@ -1,19 +1,18 @@
 try:
     from model import NNModel
 
-    from keras.optimizers import Adam, RMSprop
-    from keras.losses import categorical_crossentropy, sparse_categorical_crossentropy, binary_crossentropy
-    from keras.metrics import categorical_accuracy, sparse_categorical_accuracy
-
     from PIL import Image
     from scipy.misc import imsave, imresize
 
-    # Importing the required Keras modules containing model and layers
+    # Importing the required Keras modules containing models, layers, optimizers, losses, etc
     from keras.models import Model
     from keras.layers import Input, Conv2D, Dropout, MaxPooling2D, UpSampling2D, Concatenate, Activation
     from keras.layers.normalization import BatchNormalization
     from keras.layers.core import Reshape, Permute
     from keras.preprocessing.image import img_to_array, load_img
+    from keras.optimizers import Adam, RMSprop
+    from keras.losses import categorical_crossentropy, sparse_categorical_crossentropy, binary_crossentropy
+    from keras.metrics import categorical_accuracy, sparse_categorical_accuracy, binary_accuracy
 
     from os import listdir
     from os.path import isfile, exists, join
@@ -42,9 +41,9 @@ class RoadsModel(NNModel):
         NNModel.__init__(self, "model", "roads")
 
         # Number of classes to segment
-        # [1,0] -> not a road
-        # [0,1] -> a road
-        self.__nClasses = 2
+        # 0 -> not a road
+        # 1 -> a road
+        self.__nClasses = 1
         # Input data shape
         self.input_shape = (400, 1200, 3)
 
@@ -69,6 +68,9 @@ class RoadsModel(NNModel):
 
             x_files = [join(x_dir, n) for n in listdir(x_dir) if isfile(join(x_dir, n))]
             y_files = [join(y_dir, n) for n in listdir(y_dir) if isfile(join(y_dir, n))]
+
+            assert len(x_files) ==  len(y_files)
+
             while True:
                 x, y = list(), list()
                 for _ in range(batch_size):
@@ -87,9 +89,9 @@ class RoadsModel(NNModel):
                     x_img, y_img = transfromXY(x_img, y_img)
 
                     # Change y shape : (m, n, 3) -> (m, n, 2) (2 is the class number)
-                    temp_y_img = np.zeros(self.input_shape[:2] + (2,))
-                    temp_y_img[y_img[:,:,1] != 255] = [1,0]
-                    temp_y_img[y_img[:,:,1] == 255] = [0,1]
+                    temp_y_img = np.zeros(self.input_shape[:2] + (1,))
+                    temp_y_img[y_img[:,:,1] != 255] = 0
+                    temp_y_img[y_img[:,:,1] == 255] = 1
                     y_img = temp_y_img
 
                     # Convert to float
@@ -243,11 +245,15 @@ class RoadsModel(NNModel):
         acti7   = Activation(tf.nn.relu, name='acti7_2')(bnor7)
 
         # ----- Eighth Convolution (outputs) -----
-        # 1x1 Convolution
-        conv8   = Conv2D(self.__nClasses, (1, 1), padding='same', data_format='channels_last', name='conv8_1')(acti7)
+        conv8   = Conv2D(2, (3, 3), padding='same', data_format='channels_last', name='conv8_1')(acti7)
         print("conv8:", conv8.shape)
         bnor8   = BatchNormalization(name='bnor8_1')(conv8)
-        acti8   = Activation(tf.nn.softmax, name='acti8_1')(bnor8)
+        acti8   = Activation(tf.nn.sigmoid, name='acti8_1')(bnor8)
+        # 1x1 Convolution
+        conv8   = Conv2D(self.__nClasses, (1, 1), padding='same', data_format='channels_last', name='conv8_2')(acti8)
+        print("conv8:", conv8.shape)
+        bnor8   = BatchNormalization(name='bnor8_2')(conv8)
+        acti8   = Activation(tf.nn.sigmoid, name='acti8_2')(bnor8)
 
         # Set a new model with the inputs and the outputs (eighth convolution)
         self.setModel(Model(inputs=inputs, outputs=acti8))
@@ -260,12 +266,12 @@ class RoadsModel(NNModel):
         Compiles and fits a model, evaluation is optional.
         """
         # Compiling the model with an optimizer and a loss function
-        self._model.compile(optimizer=RMSprop(lr=1e-4),
+        self._model.compile(optimizer=Adam(lr=1e-4),
                         loss=binary_crossentropy,
                         metrics=["accuracy"])
 
         # Number of epochs
-        epochs = 10
+        epochs = 5
 
         # Fitting the model by using our train and validation data
         # It returns the history that can be plot in the future
@@ -273,7 +279,7 @@ class RoadsModel(NNModel):
             # Fit including validation datas
             self._history = self._model.fit_generator(
                 self.datas["train_generator"],
-                steps_per_epoch = 300,
+                steps_per_epoch = 1000,
                 epochs = epochs,
                 validation_data = self.datas["val_generator"],
                 validation_steps = 20)
@@ -323,7 +329,7 @@ class RoadsModel(NNModel):
         pred = self._model.predict(self.__imgToPredict.reshape((1,) + self.input_shape))
 
         # Erase the first dimension ((1, m, n, nClasses) -> (m, n, nClasses))
-        pred = pred.reshape(self.input_shape[:2] + (self.__nClasses,))
+        pred = pred.reshape(self.input_shape[:2])
 
         # Get the array of the real image
         img_array = np.array(Image.open(self.__filename))
@@ -333,7 +339,7 @@ class RoadsModel(NNModel):
         reshaped_img_array = np.array(Image.fromarray(img_array).resize(self.input_shape[:2][::-1]))
         # If the result for the second value is moe than 0.8 -> store a 
         # "green" array for this index
-        reshaped_img_array[pred[:,:,1] > pred[:,:,0]] = [0, 240, 0]
+        reshaped_img_array[pred >= 0.65, :] = [0, 240, 0]
         # Because we need to put the segmented road on the real image, we have to 
         # reshape the predicted array to the real shape
         reshaped_img_array = np.array(Image.fromarray(reshaped_img_array).resize(real_shape[:2][::-1]))

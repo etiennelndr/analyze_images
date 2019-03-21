@@ -269,6 +269,7 @@ class MainWindow(QMainWindow):
         # Get file path
         filename, _ = QFileDialog.getOpenFileName(self, "Open File", "","PNG Files (*.png);;JPG Files (*.jpg;*.jpeg);;HDR Files (*.hdr);;NII Files (*.nii);;All Files (*)", options=options)
         if filename[-3:] in ["jpg", "png"] or filename[-4:] == "jpeg": # Is it a jpg file ?
+            self.__imgToPredict = filename
             self.__model.loadDataToPredict(filename)
         elif filename[-3:] in ["hdr", "nii"]: # Is it a hdr or a nii file ?
             self.__MRIfilename = filename
