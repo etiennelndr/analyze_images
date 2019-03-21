@@ -112,3 +112,4 @@ datas/**
 *.pyproj
 *.sln
 src/.vs/src/v15/.suo
+*.TMP
