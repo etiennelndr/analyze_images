@@ -50,6 +50,7 @@ try:
     from animalsmodel import AnimalsModel
     from digitsmodel  import DigitsModel
     from roadsmodel   import RoadsModel
+    from aerialmodel  import AerialModel
 except ImportError as err:
     exit(err)
 
@@ -190,17 +191,22 @@ class MainWindow(QMainWindow):
 
     def __createConnections(self):
         """
-        Creates connections between actions/buttons and methods
+        Creates connections between actions/buttons/etc and methods.
         """
+        # Actions
         self.__ui.exitAct.triggered.connect(self.close)
         self.__ui.openAct.triggered.connect(self.openFile)
+        # Buttons
         self.__ui.createModelBtn.clicked.connect(self.createModel)
         self.__ui.openModelBtn.clicked.connect(self.openModel)
         self.__ui.predictValueBtn.clicked.connect(self.predictValue)
         self.__ui.plotBtn.clicked.connect(self.plot)
+        # Radio buttons
         self.__ui.roadsRadioBtn.clicked.connect(lambda: self.setModel("roads"))
         self.__ui.digitsRadioBtn.clicked.connect(lambda: self.setModel("digits"))
         self.__ui.animalsRadioBtn.clicked.connect(lambda: self.setModel("animals"))
+        self.__ui.aerialImagesRadioBtn.clicked.connect(lambda: self.setModel("aeriam"))
+        # Console check box
         self.__ui.useConsoleCheckBox.stateChanged.connect(lambda: self.useConsole(self.__ui.useConsoleCheckBox))
  
     def closeEvent(self, event):
@@ -323,6 +329,9 @@ class MainWindow(QMainWindow):
 
     @pyqtSlot(bool)
     def done(self, ret):
+        """
+        Inform the user of the end of the model training.
+        """
         self.__generatingModel = False
         self.__ui.progressBar.setValue(0)
 
@@ -343,6 +352,10 @@ class MainWindow(QMainWindow):
 
     @pyqtSlot()
     def predictValue(self):
+        """
+        Predict segmentation or classification of a specific image. Before calling this
+        method you have to load an image with the method MainWindow.openFile().
+        """
         if self.__isModelLoaded:
             if self.__imgToPredict is not None:
                 # Predict the value
@@ -366,8 +379,10 @@ class MainWindow(QMainWindow):
             history = self.__model.getHistory()
             print(history.history.keys())
             keys = history.history.keys()
+            # Training accuracy and loss
             x_acc      = history.history[keys[3]]
             x_loss     = history.history[keys[2]]
+            # Validation accuracy and loss
             x_val_acc  = history.history[keys[1]]
             x_val_loss = history.history[keys[0]]
 
@@ -382,12 +397,12 @@ class MainWindow(QMainWindow):
             ax1.plot(x_val_acc)
             ax1.set_xlabel("epoch")
             ax1.set_ylabel("accuracy")
-            ax1.set_title("Model Accuracy")
+            ax1.set_title("Training and validation accuracy")
             ax2.plot(x_loss)
             ax2.plot(x_val_loss)
             ax2.set_xlabel("epoch")
             ax2.set_ylabel("loss")
-            ax2.set_title("Model Loss")
+            ax2.set_title("Training and validation loss")
 
             # Refresh canvas
             self.__canvas.draw()
@@ -396,13 +411,18 @@ class MainWindow(QMainWindow):
 
     @pyqtSlot(str)
     def setModel(self, radioBtn):
+        """
+        Thanks to the selected radio button, instantiate a new neural network model.
+        """
         self.__data_to_process = radioBtn
         if radioBtn == "roads":
             self.__model = RoadsModel()
         elif radioBtn == "digits":
             self.__model = DigitsModel()
         elif radioBtn == "animals":
-            self.__model == AnimalsModel()
+            self.__model = AnimalsModel()
+        elif radioBtn == "aerial":
+            self.__model = AerialModel()
 
 if __name__ == "__main__":
     print("ERROR: this is not the main file of this program.")
