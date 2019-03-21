@@ -45,14 +45,14 @@ class RoadsModel(NNModel):
         # 1 -> a road
         self.__nClasses = 1
         # Input data shape
-        self.input_shape = (400, 1200, 3)
+        self.input_shape = (208, 608, 3)
 
     def createLayers(self):
         """
         Create each layer of the model.
         """
-        base_dir  = "C:/Users/e_sgouge/Documents/Etienne/Python/analyze_images/datas/data_road"
-        #base_dir = "D:/Documents/Programmation/Python/UtilisationCNN/datas/data_road"
+        #base_dir  = "C:/Users/e_sgouge/Documents/Etienne/Python/analyze_images/datas/data_road"
+        base_dir = "D:/Documents/Programmation/Python/analyze_images/datas/data_road"
         train_dir = join(base_dir, "training")
         val_dir   = join(base_dir, "validation")
 
@@ -89,7 +89,7 @@ class RoadsModel(NNModel):
                     x_img, y_img = transfromXY(x_img, y_img)
 
                     # Change y shape : (m, n, 3) -> (m, n, 2) (2 is the class number)
-                    temp_y_img = np.zeros(self.input_shape[:2] + (1,))
+                    temp_y_img = np.zeros(self.input_shape[:2] + (self.__nClasses,))
                     temp_y_img[y_img[:,:,1] != 255] = 0
                     temp_y_img[y_img[:,:,1] == 255] = 1
                     y_img = temp_y_img
@@ -271,7 +271,7 @@ class RoadsModel(NNModel):
                         metrics=["accuracy"])
 
         # Number of epochs
-        epochs = 5
+        epochs = 2
 
         # Fitting the model by using our train and validation data
         # It returns the history that can be plot in the future
@@ -279,17 +279,16 @@ class RoadsModel(NNModel):
             # Fit including validation datas
             self._history = self._model.fit_generator(
                 self.datas["train_generator"],
-                steps_per_epoch = 1000,
+                steps_per_epoch = 200,
                 epochs = epochs,
                 validation_data = self.datas["val_generator"],
-                validation_steps = 20)
+                validation_steps = 50)
         elif "train_generator" in self.datas:
             # Fit without validation datas
             self._history = self._model.fit_generator(
                 self.datas["train_generator"],
                 steps_per_epoch = 100,
-                epochs = epochs,
-                validation_steps = 20)
+                epochs = epochs)
         else:
             raise NotImplementedError("Unknown data")
 

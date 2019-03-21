@@ -4,7 +4,7 @@ from PIL import Image
 import numpy as np
 
 #dir_path = "C:/Users/e_sgouge/Documents/Etienne/Python/Reconnaissance_chiffre/datas/data_road/validation/y"
-dir_path = "C:/Users/e_sgouge/Documents/Etienne/Python/Reconnaissance_chiffre/datas/data_road/training/y"
+dir_path = "D:/Documents/Programmation/Python/analyze_images/datas/data_road/training/y"
 
 assert exists(dir_path) == True
 
@@ -15,12 +15,7 @@ print(files)
 for f in files:
     img = Image.open(f)
     img_array = np.array(img)
-    for i in range(img_array.shape[0]):
-        for j in range(img_array.shape[1]):
-            #if img_array[i,j,:][0] == 255 and img_array[i,j,:][2] == 255:
-            #    img_array[i,j,:] = np.array([0,255,0])
-            if np.array_equal(img_array[i,j,:], np.array([0,0,0])):
-                img_array[i,j,:][1] = 255
+    img_array[img_array[:,:,2] > 200] = [0,255,0]
 
     # Create a new Image instance with the new_img_array array
     new_img = Image.fromarray(img_array.astype('uint8'))

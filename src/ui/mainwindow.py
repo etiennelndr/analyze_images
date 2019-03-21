@@ -67,7 +67,7 @@ class ThreadCreateModel(QThread):
     def __init__(self, mw):
         QThread.__init__(self)
         # Attributes
-        self.__mw        = mw
+        self.__mw = mw
 
         self.threadDone.connect(self.__mw.done)
 
@@ -205,7 +205,7 @@ class MainWindow(QMainWindow):
         self.__ui.roadsRadioBtn.clicked.connect(lambda: self.setModel("roads"))
         self.__ui.digitsRadioBtn.clicked.connect(lambda: self.setModel("digits"))
         self.__ui.animalsRadioBtn.clicked.connect(lambda: self.setModel("animals"))
-        self.__ui.aerialImagesRadioBtn.clicked.connect(lambda: self.setModel("aeriam"))
+        self.__ui.aerialImagesRadioBtn.clicked.connect(lambda: self.setModel("aerial"))
         # Console check box
         self.__ui.useConsoleCheckBox.stateChanged.connect(lambda: self.useConsole(self.__ui.useConsoleCheckBox))
  
@@ -379,7 +379,7 @@ class MainWindow(QMainWindow):
         if self.__model is not None and self.__model.getHistory() is not None:
             history = self.__model.getHistory()
             print(history.history.keys())
-            keys = history.history.keys()
+            keys = list(history.history.keys())
             # Training accuracy and loss
             x_acc      = history.history[keys[3]]
             x_loss     = history.history[keys[2]]

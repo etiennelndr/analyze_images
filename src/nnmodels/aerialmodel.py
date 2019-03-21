@@ -1,5 +1,31 @@
 try:
     from model import NNModel
+
+    from PIL import Image
+    from scipy.misc import imsave, imresize
+
+    # Importing the required Keras modules containing models, layers, optimizers, losses, etc
+    from keras.models import Model
+    from keras.layers import Input, Conv2D, Dropout, MaxPooling2D, UpSampling2D, Concatenate, Activation
+    from keras.layers.normalization import BatchNormalization
+    from keras.layers.core import Reshape, Permute
+    from keras.preprocessing.image import img_to_array, load_img
+    from keras.optimizers import Adam, RMSprop
+    from keras.losses import categorical_crossentropy, sparse_categorical_crossentropy, binary_crossentropy
+    from keras.metrics import categorical_accuracy, sparse_categorical_accuracy, binary_accuracy
+
+    from os import listdir
+    from os.path import isfile, exists, join
+    from os.path import split as pathsplit
+    from random import randint
+
+    import tensorflow as tf
+
+    import matplotlib.pyplot as plt
+
+    import numpy as np
+
+    from image import transfromXY
 except ImportError as err:
     exit(err)
 
@@ -12,12 +38,12 @@ class AerialModel(NNModel):
         """
         Initialization of the model.
         """
-        NNModel.__init__(self, "model", "roads")
+        NNModel.__init__(self, "model", "aerial")
 
         # Number of classes to segment
-        # [1,0] -> not a road
-        # [0,1] -> a road
-        self.__nClasses = 2
+        # 0 -> not a building
+        # 1 -> a building
+        self.__nClasses = 1
         # Input data shape
         self.input_shape = (336, 336, 3)
 
@@ -25,8 +51,8 @@ class AerialModel(NNModel):
         """
         Creates each layer of the model.
         """
-        base_dir  = "C:/Users/e_sgouge/Documents/Etienne/Python/analyze_images/datas/aerial_images"
-        #base_dir  = "D:/Documents/Programmation/Python/UtilisationCNN/datas/aerial_images"
+        #base_dir  = "C:/Users/e_sgouge/Documents/Etienne/Python/analyze_images/datas/aerial_images"
+        base_dir  = "D:/Documents/Programmation/Python/analyze_images/datas/aerial_images"
         train_dir = join(base_dir, "training")
         val_dir   = join(base_dir, "validation")
 
@@ -42,6 +68,9 @@ class AerialModel(NNModel):
 
             x_files = [join(x_dir, n) for n in listdir(x_dir) if isfile(join(x_dir, n))]
             y_files = [join(y_dir, n) for n in listdir(y_dir) if isfile(join(y_dir, n))]
+            
+            assert len(x_files) ==  len(y_files)
+            
             while True:
                 x, y = list(), list()
                 for _ in range(batch_size):
@@ -60,9 +89,9 @@ class AerialModel(NNModel):
                     x_img, y_img = transfromXY(x_img, y_img)
 
                     # Change y shape : (m, n, 3) -> (m, n, 2) (2 is the class number)
-                    temp_y_img = np.zeros(self.input_shape[:2] + (2,))
-                    temp_y_img[y_img[:,:,1] != 255] = [1,0]                     # TODO: change this line
-                    temp_y_img[y_img[:,:,1] == 255] = [0,1]                     # TODO: change this line
+                    temp_y_img = np.zeros(self.input_shape[:2] + (1,))
+                    temp_y_img[y_img[:,:,0] == 0]   = 0
+                    temp_y_img[y_img[:,:,0] == 255] = 1
                     y_img = temp_y_img
 
                     # Convert to float
@@ -305,7 +334,7 @@ class AerialModel(NNModel):
         reshaped_img_array = np.array(Image.fromarray(img_array).resize(self.input_shape[:2][::-1]))
         # If the result for the second value is moe than 0.8 -> store a 
         # "green" array for this index
-        reshaped_img_array[pred[:,:,1] > pred[:,:,0]] = [0, 240, 0]             # TODO: change this line
+        reshaped_img_array[pred > 0.65] = [0, 240, 0]
         # Because we need to put the segmented road on the real image, we have to 
         # reshape the predicted array to the real shape
         reshaped_img_array = np.array(Image.fromarray(reshaped_img_array).resize(real_shape[:2][::-1]))
