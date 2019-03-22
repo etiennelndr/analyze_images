@@ -1,5 +1,5 @@
 try:
-    from model import NNModel
+    from .model import NNModel
 
     from keras.layers import Conv2D, Dropout, MaxPooling2D, Flatten, Dense
     from keras.preprocessing.image import ImageDataGenerator, load_img, img_to_array, array_to_img
@@ -32,8 +32,8 @@ class AnimalsModel(NNModel):
         """
         Creates each layer of the model.
         """
-        #base_dir  = "C:/Users/e_sgouge/Documents/Etienne/Python/analyze_images/datas/dogs_vs_cats"
-        base_dir  = "D:/Documents/Programmation/Python/analyze_images/datas/dogs_vs_cats"
+        base_dir  = "C:/Users/e_sgouge/Documents/Etienne/Python/analyze_images/datas/dogs_vs_cats"
+        #base_dir  = "D:/Documents/Programmation/Python/analyze_images/datas/dogs_vs_cats"
         train_dir = join(base_dir, "training")
         val_dir   = join(base_dir, "validation")
         test_dir  = join(base_dir, "testing")

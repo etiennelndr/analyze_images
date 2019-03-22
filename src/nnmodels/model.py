@@ -22,14 +22,19 @@ class NNModel(object):
     """
     Neural network model.
     """
+    MODEL_TYPES = {
+        'sequential': Sequential, 
+        'model'     : Model
+    }
 
-    def __init__(self, model_name="sequential", data_to_process="digits"):
+    # Constructor
+    def __init__(self, model_type="sequential", data_to_process="digits"):
         """
         Initialization of the model.
         """
-        self._model_name      = model_name
+        self._model_type      = model_type
         self._data_to_process = data_to_process
-        # History of model fitting
+        # History of model training
         self._history = None
         # Initialize the main model
         self._initModel()
@@ -38,12 +43,10 @@ class NNModel(object):
         """
         Initializes the main model.
         """
-        if self._model_name == "sequential":
-            self._model = Sequential()
-        elif self._model_name == "model":
-            self._model = Model()
-        else:
-            raise NameError("Unknown model type: {}".format(self._model_name))
+        if self._model_type not in self.MODEL_TYPES:
+            raise NotImplementedError('Unknown model type: {}'.format(self._model_type))
+
+        self.__model = self.MODEL_TYPES[self._model_type]
 
     def addLayer(self, layer):
         """
@@ -57,11 +60,12 @@ class NNModel(object):
         """
         self._initModel()
 
-    def getModelName(self):
+    # Getters
+    def getModelType(self):
         """
         Returns model name.
         """
-        return self._model_name
+        return self._model_type
 
     def getModel(self):
         """
@@ -81,11 +85,37 @@ class NNModel(object):
         """
         return self._history
 
+    # Setters
     def setDataToProcess(self, data_to_process):
         """
         Sets a new value to the type of data to process.
         """
         self._data_to_process = data_to_process
+
+    # Abstract methods
+    def createLayers(self):
+        """
+        Creates each layer of the model.
+        """
+        raise NotImplementedError("Please implement this method.")
+
+    def learn(self):
+        """
+        Compiles and fits a model, evaluation is optional.
+        """
+        raise NotImplementedError("Please implement this method.")
+
+    def loadDataToPredict(self, filename):
+        """
+        Loads data to predict.
+        """
+        raise NotImplementedError("Please implement this method.")
+
+    def predictValue(self):
+        """
+        Predicts a value with a given data.
+        """
+        raise NotImplementedError("Please implement this method.")
 
     def saveModel(self, basename="basename", dir="models"):
         """
@@ -134,32 +164,7 @@ class NNModel(object):
         # Load weights
         self._model.load_weights(weightsFileName)
 
-    # Abstract methods
-    def createLayers(self):
-        """
-        Creates each layer of the model.
-        """
-        raise NotImplementedError("Please implement this method.")
-
-    def learn(self):
-        """
-        Compiles and fits a model, evaluation is optional.
-        """
-        raise NotImplementedError("Please implement this method.")
-
-    def loadDataToPredict(self, filename):
-        """
-        Loads data to predict.
-        """
-        raise NotImplementedError("Please implement this method.")
-
-    def predictValue(self):
-        """
-        Predicts a value with a given data.
-        """
-        raise NotImplementedError("Please implement this method.")
-
-    def conv2d(self, inputs, filters=32, kernel_size=(3,3), action=None, pool_size=(2,2), up_size=(2,2)):
+    def conv2d(self, inputs, filters, kernel_size=(3,3), action=None, pool_size=(2,2), up_size=(2,2)):
         """
         Creates and returns a layer with multiple convolution, dropout, up-sampling, max-pooling, etc layers.
 
@@ -209,7 +214,7 @@ class NNModel(object):
 
     @staticmethod
     def _soft_dice_loss(y_true, y_pred, epsilon=1e-6): 
-        ''' 
+        """
         From: https://gist.github.com/jeremyjordan/9ea3032a32909f71dd2ab35fe3bacc08
 
         Soft dice loss calculation for arbitrary batch size, number of classes, and number of spatial dimensions.
@@ -227,7 +232,7 @@ class NNModel(object):
             https://mediatum.ub.tum.de/doc/1395260/1395260.pdf (page 72)
         
             Adapted from https://github.com/Lasagne/Recipes/issues/99#issuecomment-347775022
-        '''
+        """
     
         # Skip the batch and class axis for calculating Dice score
         axes = tuple(range(1, len(y_pred.shape)-1)) 

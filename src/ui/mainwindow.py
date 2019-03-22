@@ -3,7 +3,7 @@ try:
     from datetime import datetime
 
     # Design
-    from design import Ui_MainWindow
+    from .design import Ui_MainWindow
 
     from PyQt5.QtWidgets import QMainWindow, QMessageBox, QFileDialog
     from PyQt5.QtGui import QTextCursor
@@ -45,12 +45,11 @@ try:
     # Set the Keras session with the one from Tensorflow
     K.set_session(session)
 
-    # Import for CNN model
-    sys.path.insert(0, "nnmodels")
-    from animalsmodel import AnimalsModel
-    from digitsmodel  import DigitsModel
-    from roadsmodel   import RoadsModel
-    from aerialmodel  import AerialModel
+    # Import CNN models
+    from nnmodels import AnimalsModel
+    from nnmodels import DigitsModel
+    from nnmodels import RoadsModel
+    from nnmodels import AerialModel
 except ImportError as err:
     exit(err)
 

@@ -25,28 +25,30 @@ def transfromXY(x, y):
 
 def _returnXY(x, y):
     """
-    This method only returns x and y.
+    Returns x and y.
     """
     return x, y
 
 def _flipXY(x, y):
     """
-    Flip x and y.
+    Flips x and y.
     """
     return fliplr(x), fliplr(y)
 
 def _randomRotationXY(x, y, rot=10):
     """
-    Random rotation for x and y.
+    Does a random rotation to x and y.
     """
     # Pick a random degree of rotation between 25% on the left and 25% on the right
     rand_deg = uniform(-rot, rot)
     # FIX: set parameter "preserve_range" to True to have values in [0;255] instead of [0;1].
-    return rotate(x, rand_deg, preserve_range=True), rotate(y, rand_deg, preserve_range=True)
+    x, y = rotate(x, rand_deg, preserve_range=True), rotate(y, rand_deg, preserve_range=True)
+    # Because of rotation we can have black areas -> we have to delete them
+    return x, y
 
 def _randomNoiseXY(x, y):
     """
-    Add random noise x but nothing to y.
+    Adds random noise to x but nothing to y.
     """
     nx = random_noise(x)*255.0
     if mean(nx) > mean(x)+10:

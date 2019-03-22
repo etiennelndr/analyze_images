@@ -1,5 +1,5 @@
 try:
-    from model import NNModel
+    from .model import NNModel
 
     from keras.layers import Conv2D, Dropout, MaxPooling2D, Flatten, Dense
     from keras.losses import sparse_categorical_crossentropy
