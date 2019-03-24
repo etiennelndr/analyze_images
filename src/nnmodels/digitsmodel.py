@@ -66,6 +66,9 @@ class DigitsModel(NNModel):
         """
         Compiles and fits a model, evaluation is optional.
         """
+        # Starting the training
+        self._training = True
+
         # Compiling the model with an optimizer and a loss function
         self._model.compile(optimizer=Adam(),
                              loss=[sparse_categorical_crossentropy],
@@ -88,6 +91,9 @@ class DigitsModel(NNModel):
         if "x_test" in self.datas and "y_test" in self.datas:
             # Evaluate the model
             self._model.evaluate(self.datas["x_test"], self.datas["y_test"])
+
+        # Training is over
+        self._training = False
 
     def loadDataToPredict(self, filename):
         """

@@ -32,11 +32,15 @@ class AnimalsModel(NNModel):
         """
         Creates each layer of the model.
         """
-        base_dir  = "C:/Users/e_sgouge/Documents/Etienne/Python/analyze_images/datas/dogs_vs_cats"
-        #base_dir  = "D:/Documents/Programmation/Python/analyze_images/datas/dogs_vs_cats"
+        #base_dir  = "C:/Users/e_sgouge/Documents/Etienne/Python/analyze_images/datas/dogs_vs_cats"
+        base_dir  = "D:/Documents/Programmation/Python/analyze_images/datas/dogs_vs_cats"
         train_dir = join(base_dir, "training")
         val_dir   = join(base_dir, "validation")
         test_dir  = join(base_dir, "testing")
+
+        assert exists(train_dir) == True
+        assert exists(val_dir)   == True
+        assert exists(test_dir)  == True
 
         train_datagen = ImageDataGenerator(rescale=1./255,
                                             rotation_range=40,
@@ -89,6 +93,9 @@ class AnimalsModel(NNModel):
         """
         Compiles and fits a model, evaluation is optional.
         """
+        # Starting the training
+        self._training = True
+
         # Compiling the model with an optimizer and a loss function
         self._model.compile(optimizer=Adam(lr=1e-3),
                         loss=categorical_crossentropy,#[sparse_categorical_crossentropy],
@@ -117,6 +124,9 @@ class AnimalsModel(NNModel):
         if "test_generator" in data:
             # Evaluation of the model
             self._model.evaluate_generator(data["test_generator"], steps=50, verbose=1)
+
+        # Training is over
+        self._training = False
 
     def loadDataToPredict(self, filename):
         """
