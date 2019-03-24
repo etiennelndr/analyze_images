@@ -22,6 +22,8 @@ class NNModel(object):
     """
     Neural network model.
     """
+
+    # Different model types
     MODEL_TYPES = {
         'sequential': Sequential, 
         'model'     : Model
@@ -36,6 +38,8 @@ class NNModel(object):
         self._data_to_process = data_to_process
         # History of model training
         self._history = None
+        # Training state is set to False
+        self._training = False
         # Initialize the main model
         self._initModel()
 
@@ -46,7 +50,7 @@ class NNModel(object):
         if self._model_type not in self.MODEL_TYPES:
             raise NotImplementedError('Unknown model type: {}'.format(self._model_type))
 
-        self.__model = self.MODEL_TYPES[self._model_type]
+        self._model = self.MODEL_TYPES[self._model_type]
 
     def addLayer(self, layer):
         """
@@ -84,6 +88,13 @@ class NNModel(object):
         Returns the history of model training.
         """
         return self._history
+
+    def isTraining(self):
+        """
+        Returns the training state of the model. It returns True if the model
+        is currently training, otherwise False.
+        """
+        return self._training
 
     # Setters
     def setDataToProcess(self, data_to_process):

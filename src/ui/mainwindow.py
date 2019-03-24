@@ -124,8 +124,6 @@ class MainWindow(QMainWindow):
         # File for model loading
         self.__modelFilename = None
 
-        self.__generatingModel = False
-
         self.__data_to_process = "digits"
 
         # Initialize the model
@@ -243,7 +241,7 @@ class MainWindow(QMainWindow):
         Appends text to the QTextEdit.
         """
         # If we're currently generating a new neural network model
-        if self.__generatingModel:
+        if self.__model.isTraining():
             txtSplit = text.split(" ")
             # Get the epoch and show it in the progress bar
             if txtSplit[0] == "Epoch":
@@ -266,8 +264,8 @@ class MainWindow(QMainWindow):
         # Set options
         options = QFileDialog.Options()
         # Get file path
-        filename, _ = QFileDialog.getOpenFileName(self, "Open File", "","PNG Files (*.png);;JPG Files (*.jpg;*.jpeg);;HDR Files (*.hdr);;NII Files (*.nii);;All Files (*)", options=options)
-        if filename[-3:] in ["jpg", "png"] or filename[-4:] == "jpeg": # Is it a jpg file ?
+        filename, _ = QFileDialog.getOpenFileName(self, "Open File", "","PNG Files (*.png);;JPG Files (*.jpg;*.jpeg);;TIF Files (*.tif);;HDR Files (*.hdr);;NII Files (*.nii);;All Files (*)", options=options)
+        if filename[-3:] in ["jpg", "png", "tif"] or filename[-4:] == "jpeg": # Is it a jpg file ?
             self.__imgToPredict = filename
             self.__model.loadDataToPredict(filename)
         elif filename[-3:] in ["hdr", "nii"]: # Is it a hdr or a nii file ?
@@ -314,8 +312,6 @@ class MainWindow(QMainWindow):
         # Create all layers
         self.__model.createLayers()
 
-        self.__generatingModel = True
-
         # Compile, fit and evalute the model in a new thread
         self.__thread = ThreadCreateModel(self)
         self.__thread.setTerminationEnabled(True)
@@ -332,7 +328,6 @@ class MainWindow(QMainWindow):
         """
         Inform the user of the end of the model training.
         """
-        self.__generatingModel = False
         self.__ui.progressBar.setValue(0)
 
         #self.__ui.stopModelCreationBtn.setEnabled(False)
