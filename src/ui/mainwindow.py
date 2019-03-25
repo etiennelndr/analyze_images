@@ -65,7 +65,7 @@ class ThreadCreateModel(QThread):
 
     def __init__(self, mw):
         QThread.__init__(self)
-        # Attributes
+        # Main window instance
         self.__mw = mw
 
         self.threadDone.connect(self.__mw.done)
@@ -75,7 +75,7 @@ class ThreadCreateModel(QThread):
 
     def run(self):
         """
-        Main function --> it runs the current thread until its work is done.
+        Main function -> it runs the current thread until its work is done.
         """
         with tf_session.as_default():
             with tf_graph.as_default():

@@ -40,7 +40,7 @@ class Parser(object):
 
         for i in range(start, len(selg.__argv), 1):
             # Split the current argv to retrieve the argument and its value
-            a = selg.__argv[i].split("=")
+            a = self.__argv[i].split("=")
             # If the lentgh is not equal to 2 we must return an error
             if len(a) != 2:
                 self.__raiseError("ERROR: you have to use args this way -> [argument]=[value]")

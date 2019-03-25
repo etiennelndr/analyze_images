@@ -54,7 +54,7 @@ class NNModel(object):
 
     def addLayer(self, layer):
         """
-        Adds a new layer to the model.
+        Adds a new layer to a sequential model.
         """
         self._model.add(layer)
 
