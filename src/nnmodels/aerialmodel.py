@@ -365,6 +365,7 @@ class AerialModel(NNModel):
         pred = np.zeros(real_shape[:2] + (1,))
         for i in range(int(real_shape[0]/500)):
             for j in range(int(real_shape[1]/500)):
+                print(i,j)
                 # Get a sub-array of the main array
                 sub_array  = self.__imgToPredict[i*500:(i+1)*500:, j*500:(j+1)*500:, :]
                 sub_img = array_to_img(sub_array).resize(self.input_shape[:2])
@@ -381,9 +382,9 @@ class AerialModel(NNModel):
 
         # Reshape the image array to (m, n, 3)
         reshaped_img_array = np.array(Image.fromarray(img_array).resize(real_shape[:2][::-1]))
-        # If the result for the second value is moe than 0.65 -> store a 
+        # If the result for the second value is more than 0.85 -> store a 
         # "green" array for this index
-        reshaped_img_array[pred[:,:,0] > 0.65] = [0, 240, 0]
+        reshaped_img_array[pred[:,:,0] > 0.85] = [0, 240, 0]
         # Because we need to put the segmented road on the real image, we have to
         # reshape the predicted array to the real shape
         reshaped_img_array = np.array(Image.fromarray(reshaped_img_array).resize(real_shape[:2][::-1]))
