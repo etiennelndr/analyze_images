@@ -291,13 +291,15 @@ class AerialModel(NNModel):
         # Starting the training
         self._training = True
 
-        # Compiling the model with an optimizer and a loss function
-        self._model.compile(optimizer=RMSprop(lr=1e-4),
-                        loss=binary_crossentropy,
-                        metrics=["accuracy"])
-
         # Number of epochs
         epochs = 10
+        # Learning rate
+        learning_rate = 1e-4
+        # Compiling the model with an optimizer and a loss function
+        self._model.compile(optimizer=RMSprop(lr=learning_rate),
+                        loss=binary_crossentropy,
+                        metrics=["accuracy"],
+                        decay=learning_rate/epochs)
 
         # Fitting the model by using our train and validation data
         # It returns the history that can be plot in the future

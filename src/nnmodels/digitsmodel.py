@@ -69,13 +69,15 @@ class DigitsModel(NNModel):
         # Starting the training
         self._training = True
 
-        # Compiling the model with an optimizer and a loss function
-        self._model.compile(optimizer=Adam(),
-                             loss=[sparse_categorical_crossentropy],
-                             metrics=[sparse_categorical_accuracy])
-
-        # Numbe of epochs
+        # Number of epochs
         epochs = 10
+        # Learning rate
+        learning_rate = 1e-3
+        # Compiling the model with an optimizer and a loss function
+        self._model.compile(optimizer=Adam(lr=learning_rate),
+                             loss=[sparse_categorical_crossentropy],
+                             metrics=[sparse_categorical_accuracy],
+                             decay=learning_rate/epochs)
 
         if "x_val" in self.datas and "y_val" in self.datas:
             # Fitting the model by using our train and validation data

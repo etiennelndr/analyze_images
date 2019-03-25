@@ -89,41 +89,45 @@ class AnimalsModel(NNModel):
 
         self.getModel().summary()
 
-    def learn(self, data, epochs=100):
+    def learn(self):
         """
         Compiles and fits a model, evaluation is optional.
         """
         # Starting the training
         self._training = True
 
+        # Number of epochs
+        epochs = 100
+        # Learning rate
+        learning_rate = 1e-3
         # Compiling the model with an optimizer and a loss function
-        self._model.compile(optimizer=Adam(lr=1e-3),
-                        loss=categorical_crossentropy,#[sparse_categorical_crossentropy],
-                        metrics=[categorical_accuracy])#[sparse_categorical_accuracy])
+        self._model.compile(optimizer=Adam(lr=learning_rate),
+                        loss=categorical_crossentropy,
+                        metrics=[categorical_accuracy],
+                        decay=learning_rate/epochs)
 
         # Fitting the model by using our train and validation data
         # It returns the history that can be plot in the future
-        if "train_generator" in data and "val_generator" in data:
+        if "train_generator" in self.datas and "val_generator" in self.datas:
             # Fit including validation datas
             self._history = self._model.fit_generator(
-                data["train_generator"],
+                self.datas["train_generator"],
                 steps_per_epoch = 100,
                 epochs = epochs,
-                validation_data = data["val_generator"],
+                validation_data = self.datas["val_generator"],
                 validation_steps = 20)
-        elif "train_generator" in data:
+        elif "train_generator" in self.datas:
             # Fit without validation datas
             self._history = self._model.fit_generator(
-                data["train_generator"],
+                self.datas["train_generator"],
                 steps_per_epoch = 100,
-                epochs = epochs,
-                validation_steps = 20)
+                epochs = epochs)
         else:
             raise NotImplementedError("Unknown data")
 
-        if "test_generator" in data:
+        if "test_generator" in self.datas:
             # Evaluation of the model
-            self._model.evaluate_generator(data["test_generator"], steps=50, verbose=1)
+            self._model.evaluate_generator(self.datas["test_generator"], steps=50, verbose=1)
 
         # Training is over
         self._training = False
