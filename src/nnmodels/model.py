@@ -23,7 +23,7 @@ class NNModel(object):
     """
 
     # Different model types
-    MODEL_TYPES = {
+    _MODEL_TYPES = {
         'sequential': Sequential, 
         'model'     : Model
     }
@@ -46,10 +46,10 @@ class NNModel(object):
         """
         Initializes the main model.
         """
-        if self._model_type not in self.MODEL_TYPES:
+        if self._model_type not in self._MODEL_TYPES:
             raise NotImplementedError('Unknown model type: {}'.format(self._model_type))
 
-        self._model = self.MODEL_TYPES[self._model_type]
+        self._model = self._MODEL_TYPES[self._model_type]
 
     def addLayer(self, layer):
         """
