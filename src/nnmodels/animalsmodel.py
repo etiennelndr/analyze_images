@@ -17,6 +17,9 @@ except ImportError as err:
 class AnimalsModel(NNModel):
     """
     Neural network model for animal classification.
+
+    Sources:
+        - dogs-vs-cats dataset -> https://www.kaggle.com/c/dogs-vs-cats/data
     """
 
     def __init__(self):

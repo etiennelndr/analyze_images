@@ -32,6 +32,9 @@ except ImportError as err:
 class RoadsModel(NNModel):
     """
     Neural network model for road segmentation.
+
+    Sources:
+        - roads dataset: http://www.cvlibs.net/datasets/kitti/eval_road.php
     """
 
     def __init__(self):

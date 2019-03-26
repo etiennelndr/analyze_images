@@ -32,6 +32,10 @@ except ImportError as err:
 class AerialModel(NNModel):
     """
     Neural network model for aerial images segmentation.
+
+    Sources:
+        - roads dataset     -> https://www.cs.toronto.edu/~vmnih/data/          # Not implemented
+        - buildings dataset -> https://project.inria.fr/aerialimagelabeling/    # Implemented
     """
 
     def __init__(self):

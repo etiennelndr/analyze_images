@@ -9,7 +9,6 @@ try:
     from keras.losses import sparse_categorical_crossentropy
     from keras.metrics import sparse_categorical_accuracy
     from keras.optimizers import Adam, RMSprop, SGD
-
     from tensorflow.nn import relu
 
     import numpy as np
@@ -41,9 +40,9 @@ class NNModel(object):
         # Training state is set to False
         self._training = False
         # Initialize the main model
-        self._initModel()
+        self.__initModel()
 
-    def _initModel(self):
+    def __initModel(self):
         """
         Initializes the main model.
         """
@@ -62,7 +61,7 @@ class NNModel(object):
         """
         Re-initializes the model (~ rollback).
         """
-        self._initModel()
+        self.__initModel()
 
     # Getters
     def getModelType(self):
