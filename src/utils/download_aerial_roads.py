@@ -59,9 +59,11 @@ for i in range(len(urls)):
     response = str(urlopen(urls[i]).read())
 
     resps = response.split('href="')
-    print(len(resps))
-    resps = [r.split('">')[0] for r in resps if r.split('">')[0][-4:] == "tiff"]
-    print(len(resps))
+
+    if 'map' in urls[i]:
+        resps = [r.split('">')[0] for r in resps if r.split('">')[0][-3:] == "tif"]
+    else:
+        resps = [r.split('">')[0] for r in resps if r.split('">')[0][-4:] == "tiff"]
 
     for url in resps:
         print(url)
