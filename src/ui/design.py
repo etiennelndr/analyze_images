@@ -2,12 +2,11 @@
 
 # Form implementation generated from reading ui file 'ui_MainWindow.ui'
 #
-# Created by: PyQt5 UI code generator 5.12
+# Created by: PyQt5 UI code generator 5.11.3
 #
 # WARNING! All changes made in this file will be lost!
 
 from PyQt5 import QtCore, QtGui, QtWidgets
-
 
 class Ui_MainWindow(object):
     def setupUi(self, MainWindow):
@@ -20,7 +19,7 @@ class Ui_MainWindow(object):
         self.createModelBtn.setCursor(QtGui.QCursor(QtCore.Qt.PointingHandCursor))
         self.createModelBtn.setObjectName("createModelBtn")
         self.openModelBtn = QtWidgets.QPushButton(self.centralwidget)
-        self.openModelBtn.setGeometry(QtCore.QRect(550, 420, 93, 28))
+        self.openModelBtn.setGeometry(QtCore.QRect(550, 450, 93, 28))
         self.openModelBtn.setCursor(QtGui.QCursor(QtCore.Qt.PointingHandCursor))
         self.openModelBtn.setCheckable(False)
         self.openModelBtn.setFlat(False)
@@ -50,10 +49,10 @@ class Ui_MainWindow(object):
         self.stopModelCreationBtn.setCursor(QtGui.QCursor(QtCore.Qt.PointingHandCursor))
         self.stopModelCreationBtn.setObjectName("stopModelCreationBtn")
         self.label = QtWidgets.QLabel(self.centralwidget)
-        self.label.setGeometry(QtCore.QRect(550, 460, 101, 31))
+        self.label.setGeometry(QtCore.QRect(550, 490, 101, 31))
         self.label.setObjectName("label")
         self.currentModel = QtWidgets.QLabel(self.centralwidget)
-        self.currentModel.setGeometry(QtCore.QRect(660, 460, 161, 31))
+        self.currentModel.setGeometry(QtCore.QRect(660, 490, 161, 31))
         self.currentModel.setObjectName("currentModel")
         self.label_5 = QtWidgets.QLabel(self.centralwidget)
         self.label_5.setGeometry(QtCore.QRect(126, 90, 101, 31))
@@ -76,10 +75,10 @@ class Ui_MainWindow(object):
         self.plotLayout.setContentsMargins(0, 0, 0, 0)
         self.plotLayout.setObjectName("plotLayout")
         self.roadsRadioBtn = QtWidgets.QRadioButton(self.centralwidget)
-        self.roadsRadioBtn.setGeometry(QtCore.QRect(560, 350, 111, 20))
+        self.roadsRadioBtn.setGeometry(QtCore.QRect(560, 380, 111, 20))
         self.roadsRadioBtn.setObjectName("roadsRadioBtn")
         self.digitsRadioBtn = QtWidgets.QRadioButton(self.centralwidget)
-        self.digitsRadioBtn.setGeometry(QtCore.QRect(560, 380, 95, 20))
+        self.digitsRadioBtn.setGeometry(QtCore.QRect(560, 350, 95, 20))
         self.digitsRadioBtn.setChecked(True)
         self.digitsRadioBtn.setObjectName("digitsRadioBtn")
         self.animalsRadioBtn = QtWidgets.QRadioButton(self.centralwidget)
@@ -93,6 +92,9 @@ class Ui_MainWindow(object):
         self.aerialImagesRadioBtn = QtWidgets.QRadioButton(self.centralwidget)
         self.aerialImagesRadioBtn.setGeometry(QtCore.QRect(690, 380, 111, 20))
         self.aerialImagesRadioBtn.setObjectName("aerialImagesRadioBtn")
+        self.kneesRadioBtn = QtWidgets.QRadioButton(self.centralwidget)
+        self.kneesRadioBtn.setGeometry(QtCore.QRect(560, 410, 95, 20))
+        self.kneesRadioBtn.setObjectName("kneesRadioBtn")
         MainWindow.setCentralWidget(self.centralwidget)
         self.menubar = QtWidgets.QMenuBar(MainWindow)
         self.menubar.setGeometry(QtCore.QRect(0, 0, 832, 26))
@@ -136,10 +138,10 @@ class Ui_MainWindow(object):
         self.animalsRadioBtn.setText(_translate("MainWindow", "Animals"))
         self.useConsoleCheckBox.setText(_translate("MainWindow", "Use console"))
         self.aerialImagesRadioBtn.setText(_translate("MainWindow", "Aerial Images"))
+        self.kneesRadioBtn.setText(_translate("MainWindow", "Knees"))
         self.fileMenu.setTitle(_translate("MainWindow", "File"))
         self.exitAct.setText(_translate("MainWindow", "Exit"))
         self.exitAct.setShortcut(_translate("MainWindow", "Ctrl+Q"))
         self.openAct.setText(_translate("MainWindow", "Open"))
         self.openAct.setShortcut(_translate("MainWindow", "Ctrl+O"))
-
 

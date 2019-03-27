@@ -203,6 +203,7 @@ class MainWindow(QMainWindow):
         self.__ui.digitsRadioBtn.clicked.connect(lambda: self.setModel("digits"))
         self.__ui.animalsRadioBtn.clicked.connect(lambda: self.setModel("animals"))
         self.__ui.aerialImagesRadioBtn.clicked.connect(lambda: self.setModel("aerial"))
+        self.__ui.kneesRadioBtn.clicked.connect(lambda: self.setModel("knees"))
         # Console check box
         self.__ui.useConsoleCheckBox.stateChanged.connect(lambda: self.useConsole(self.__ui.useConsoleCheckBox))
  
@@ -418,6 +419,8 @@ class MainWindow(QMainWindow):
             self.__model = AnimalsModel()
         elif radioBtn == "aerial":
             self.__model = AerialModel()
+        elif radioBtn == "knees":
+            raise NotImplementedError("Knees segmentation is not currently available.")
 
 if __name__ == "__main__":
     print("ERROR: this is not the main file of this program.")
