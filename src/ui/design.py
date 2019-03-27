@@ -2,11 +2,12 @@
 
 # Form implementation generated from reading ui file 'ui_MainWindow.ui'
 #
-# Created by: PyQt5 UI code generator 5.11.3
+# Created by: PyQt5 UI code generator 5.12
 #
 # WARNING! All changes made in this file will be lost!
 
 from PyQt5 import QtCore, QtGui, QtWidgets
+
 
 class Ui_MainWindow(object):
     def setupUi(self, MainWindow):
@@ -92,9 +93,9 @@ class Ui_MainWindow(object):
         self.aerialImagesRadioBtn = QtWidgets.QRadioButton(self.centralwidget)
         self.aerialImagesRadioBtn.setGeometry(QtCore.QRect(690, 380, 111, 20))
         self.aerialImagesRadioBtn.setObjectName("aerialImagesRadioBtn")
-        self.kneesRadioBtn = QtWidgets.QRadioButton(self.centralwidget)
-        self.kneesRadioBtn.setGeometry(QtCore.QRect(560, 410, 95, 20))
-        self.kneesRadioBtn.setObjectName("kneesRadioBtn")
+        self.kidneysRadioBtn = QtWidgets.QRadioButton(self.centralwidget)
+        self.kidneysRadioBtn.setGeometry(QtCore.QRect(560, 410, 95, 20))
+        self.kidneysRadioBtn.setObjectName("kidneysRadioBtn")
         MainWindow.setCentralWidget(self.centralwidget)
         self.menubar = QtWidgets.QMenuBar(MainWindow)
         self.menubar.setGeometry(QtCore.QRect(0, 0, 832, 26))
@@ -138,10 +139,11 @@ class Ui_MainWindow(object):
         self.animalsRadioBtn.setText(_translate("MainWindow", "Animals"))
         self.useConsoleCheckBox.setText(_translate("MainWindow", "Use console"))
         self.aerialImagesRadioBtn.setText(_translate("MainWindow", "Aerial Images"))
-        self.kneesRadioBtn.setText(_translate("MainWindow", "Knees"))
+        self.kidneysRadioBtn.setText(_translate("MainWindow", "Kidneys"))
         self.fileMenu.setTitle(_translate("MainWindow", "File"))
         self.exitAct.setText(_translate("MainWindow", "Exit"))
         self.exitAct.setShortcut(_translate("MainWindow", "Ctrl+Q"))
         self.openAct.setText(_translate("MainWindow", "Open"))
         self.openAct.setShortcut(_translate("MainWindow", "Ctrl+O"))
+
 

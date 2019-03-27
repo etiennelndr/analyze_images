@@ -311,7 +311,7 @@
      <string>Aerial Images</string>
     </property>
    </widget>
-   <widget class="QRadioButton" name="kneesRadioBtn">
+   <widget class="QRadioButton" name="kidneysRadioBtn">
     <property name="geometry">
      <rect>
       <x>560</x>
@@ -321,7 +321,7 @@
      </rect>
     </property>
     <property name="text">
-     <string>Knees</string>
+     <string>Kidneys</string>
     </property>
    </widget>
   </widget>
