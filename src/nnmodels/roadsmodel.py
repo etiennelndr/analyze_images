@@ -46,7 +46,7 @@ class RoadsModel(NNModel):
         # Number of classes to segment
         # 0 -> not a road
         # 1 -> a road
-        self.__nClasses = 1
+        self.__nClasses  = 1
         # Input data shape
         self.input_shape = (208, 608, 3)
 

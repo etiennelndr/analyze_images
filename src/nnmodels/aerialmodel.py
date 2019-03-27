@@ -47,7 +47,7 @@ class AerialModel(NNModel):
         # Number of classes to segment
         # 0 -> not a building
         # 1 -> a building
-        self.__nClasses = 1
+        self.__nClasses  = 1
         # Input data shape
         self.input_shape = (336, 336, 3)
 

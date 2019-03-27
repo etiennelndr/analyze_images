@@ -50,6 +50,7 @@ try:
     from nnmodels import DigitsModel
     from nnmodels import RoadsModel
     from nnmodels import AerialModel
+    from nnmodels import KidneysModel
 except ImportError as err:
     exit(err)
 
@@ -420,7 +421,7 @@ class MainWindow(QMainWindow):
         elif radioBtn == "aerial":
             self.__model = AerialModel()
         elif radioBtn == "kidneys":
-            raise NotImplementedError("Kidneys segmentation is not currently available.")
+            self.__model = KidneysModel()
 
 if __name__ == "__main__":
     print("ERROR: this is not the main file of this program.")
