@@ -29,12 +29,11 @@ try:
 except ImportError as err:
     exit(err)
 
-class AerialModel(NNModel):
+class AerialBuildingsModel(NNModel):
     """
-    Neural network model for aerial images segmentation.
+    Neural network model for buildings segmentation in aerial images.
 
     Sources:
-        - roads dataset     -> https://www.cs.toronto.edu/~vmnih/data/          # Not implemented
         - buildings dataset -> https://project.inria.fr/aerialimagelabeling/    # Implemented
     """
 
@@ -42,7 +41,7 @@ class AerialModel(NNModel):
         """
         Initialization of the model.
         """
-        NNModel.__init__(self, "model", "aerial")
+        NNModel.__init__(self, "model", "aerial_buildings")
 
         # Number of classes to segment
         # 0 -> not a building
@@ -50,13 +49,21 @@ class AerialModel(NNModel):
         self.__nClasses  = 1
         # Input data shape
         self.input_shape = (336, 336, 3)
+        # File extensions for data to predict
+        self.FILE_EXTENSIONS  = [
+            "png",
+            "jpg",
+            "jpeg",
+            "tif",
+            "tiff"
+        ]
 
     def createLayers(self):
         """
         Creates each layer of the model.
         """
-        #base_dir  = "C:/Users/e_sgouge/Documents/Etienne/Python/analyze_images/datas/aerial_images"
-        base_dir  = "D:/Documents/Programmation/Python/analyze_images/datas/aerial_images"
+        #base_dir  = "C:/Users/e_sgouge/Documents/Etienne/Python/analyze_images/datas/aerial_buildings"
+        base_dir  = "D:/Documents/Programmation/Python/analyze_images/datas/aerial_buildings"
         train_dir = join(base_dir, "training")
         val_dir   = join(base_dir, "validation")
 
@@ -67,16 +74,17 @@ class AerialModel(NNModel):
             x_dir = join(dir, "x")
             y_dir = join(dir, "y")
 
+            assert exists(x_dir) == True
+            assert exists(y_dir) == True
+
             nbr_of_files = len([n for n in listdir(x_dir) if isfile(join(x_dir, n))])
 
             assert nbr_of_files % batch_size == 0
-            assert exists(x_dir) == True
-            assert exists(y_dir) == True
 
             x_files = [join(x_dir, n) for n in listdir(x_dir) if isfile(join(x_dir, n))]
             y_files = [join(y_dir, n) for n in listdir(y_dir) if isfile(join(y_dir, n))]
             
-            assert len(x_files) ==  len(y_files)
+            assert len(x_files) == len(y_files)
             
             while True:
                 x, y = list(), list()

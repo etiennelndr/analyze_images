@@ -49,7 +49,8 @@ try:
     from nnmodels import AnimalsModel
     from nnmodels import DigitsModel
     from nnmodels import RoadsModel
-    from nnmodels import AerialModel
+    from nnmodels import AerialBuildingsModel
+    from nnmodels import AerialRoadsModel
     from nnmodels import KidneysModel
 except ImportError as err:
     exit(err)
@@ -203,7 +204,8 @@ class MainWindow(QMainWindow):
         self.__ui.roadsRadioBtn.clicked.connect(lambda: self.setModel("roads"))
         self.__ui.digitsRadioBtn.clicked.connect(lambda: self.setModel("digits"))
         self.__ui.animalsRadioBtn.clicked.connect(lambda: self.setModel("animals"))
-        self.__ui.aerialImagesRadioBtn.clicked.connect(lambda: self.setModel("aerial"))
+        self.__ui.aerialBuildingsRadioBtn.clicked.connect(lambda: self.setModel("aerial_buildings"))
+        self.__ui.aerialRoadsRadioBtn.clicked.connect(lambda: self.setModel("aerial_roads"))
         self.__ui.kidneysRadioBtn.clicked.connect(lambda: self.setModel("kidneys"))
         # Console check box
         self.__ui.useConsoleCheckBox.stateChanged.connect(lambda: self.useConsole(self.__ui.useConsoleCheckBox))
@@ -267,11 +269,9 @@ class MainWindow(QMainWindow):
         options = QFileDialog.Options()
         # Get file path
         filename, _ = QFileDialog.getOpenFileName(self, "Open File", "","PNG Files (*.png);;JPG Files (*.jpg;*.jpeg);;TIF Files (*.tif);;HDR Files (*.hdr);;NII Files (*.nii);;All Files (*)", options=options)
-        if filename[-3:] in ["jpg", "png", "tif"] or filename[-4:] == "jpeg": # Is it a jpg file ?
+        if filename.endswith(tuple([self.__model.FILE_EXTENSIONS])):
             self.__imgToPredict = filename
             self.__model.loadDataToPredict(filename)
-        elif filename[-3:] in ["hdr", "nii"]: # Is it a hdr or a nii file ?
-            self.__MRIfilename = filename
         else:
             print("ERROR: wrong file extension.")
 
@@ -286,7 +286,7 @@ class MainWindow(QMainWindow):
         self.__modelFilename, _ = QFileDialog.getOpenFileName(self, "Open Architecture File", "","JSON Files (*.json);;HDF5 Files (*.hdf5);;All Files (*)", options=options)
         # Avoid empty file name
         if len(self.__modelFilename) != 0:
-            if self.__modelFilename[-4:] in ["json", "hdf5"]:
+            if self.__modelFilename.endswith(tuple(["json", "hdf5"])):
                 # Extract the name
                 self.__modelFilename = self.__modelFilename.split(".")[0]
                 # Open the model
@@ -418,8 +418,10 @@ class MainWindow(QMainWindow):
             self.__model = DigitsModel()
         elif radioBtn == "animals":
             self.__model = AnimalsModel()
-        elif radioBtn == "aerial":
-            self.__model = AerialModel()
+        elif radioBtn == "aerial_buildings":
+            self.__model = AerialBuildingsModel()
+        elif radioBtn == "aerial_roads":
+            self.__model = AerialRoadsModel()
         elif radioBtn == "kidneys":
             self.__model = KidneysModel()
 

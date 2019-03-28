@@ -35,10 +35,12 @@ class NNModel(object):
         """
         self._model_type      = model_type
         self._data_to_process = data_to_process
-        # History of model training
-        self._history = None
+        # Model training history
+        self._history         = None
         # Training state is set to False
-        self._training = False
+        self._training        = False
+        # File extensions for data to predict
+        self.FILE_EXTENSIONS  = list()
         # Initialize the main model
         self.__initModel()
 

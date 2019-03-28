@@ -298,7 +298,7 @@
      <bool>false</bool>
     </property>
    </widget>
-   <widget class="QRadioButton" name="aerialImagesRadioBtn">
+   <widget class="QRadioButton" name="aerialBuildingsRadioBtn">
     <property name="geometry">
      <rect>
       <x>690</x>
@@ -308,7 +308,7 @@
      </rect>
     </property>
     <property name="text">
-     <string>Aerial Images</string>
+     <string>Aerial buildings</string>
     </property>
    </widget>
    <widget class="QRadioButton" name="kidneysRadioBtn">
@@ -322,6 +322,19 @@
     </property>
     <property name="text">
      <string>Kidneys</string>
+    </property>
+   </widget>
+   <widget class="QRadioButton" name="aerialRoadsRadioBtn">
+    <property name="geometry">
+     <rect>
+      <x>690</x>
+      <y>410</y>
+      <width>95</width>
+      <height>20</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>Aerial roads</string>
     </property>
    </widget>
   </widget>

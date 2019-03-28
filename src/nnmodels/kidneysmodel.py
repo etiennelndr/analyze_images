@@ -25,6 +25,13 @@ class KidneysModel(NNModel):
         # Input data shape
         self.input_shape = (611, 512, 512) # 512 slices of 611x512 images
 
+        # File extensions for data to predict
+        self.FILE_EXTENSIONS  = [
+            "nii",
+            "nii.gz",
+            "hdr"
+        ]
+
     def createLayers(self):
         """
         Creates each layer of the model.

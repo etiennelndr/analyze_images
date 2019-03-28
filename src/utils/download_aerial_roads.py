@@ -26,7 +26,8 @@ urls = [
     testing_y_url
 ]
 
-main_folder = "D:/Documents/Programmation/Python/analyze_images/datas/aerial_roads"
+#main_folder = "D:/Documents/Programmation/Python/analyze_images/datas/aerial_roads"
+main_folder = "C:/Users/e_sgouge/Documents/Etienne/Python/analyze_images/datas/aerial_roads"
 # Training
 training_dir = join(main_folder, "training")
 training_x_dir = join(training_dir, "x")
