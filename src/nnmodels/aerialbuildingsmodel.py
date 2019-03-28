@@ -327,7 +327,7 @@ class AerialBuildingsModel(NNModel):
             # Fit without validation datas
             self._history = self._model.fit_generator(
                 self.datas["train_generator"],
-                steps_per_epoch = 500,
+                steps_per_epoch = 1000,
                 epochs = epochs)
         else:
             raise NotImplementedError("Unknown data")
