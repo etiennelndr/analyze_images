@@ -1,6 +1,6 @@
 try:
     from os import makedirs
-    from os.path import exists
+    from os.path import exists, join
 
     # Importing required Keras modules containing model and layers
     from keras.models import Sequential, Model
@@ -104,6 +104,17 @@ class NNModel(object):
         """
         self._data_to_process = data_to_process
 
+    def concatenateExtensions(self):
+        """
+        Concatenates all extensions in one sentence.
+        """
+        exts = ""
+        for i in range(len(self.FILE_EXTENSIONS)):
+            ext = self.FILE_EXTENSIONS[i]
+            exts += "{} Files (*.{});;".format(ext.upper(), ext)
+        exts += "All Files (*)"
+        return exts
+
     # Abstract methods
     def createLayers(self):
         """
@@ -139,14 +150,11 @@ class NNModel(object):
         if not exists(dir):
             makedirs(dir) # Create a new directory if it doesn't exist
 
-        # Add a slash at the end of the directory name
-        dir += "/"
-
-        with open(dir + architectureFilePath, 'wt') as json_file:
+        with open(join(dir, architectureFilePath), 'wt') as json_file:
             architecture = self._model.to_json()
             json_file.write(architecture)
 
-        weightsFilePath = dir + basename + '.hdf5'
+        weightsFilePath = join(dir, basename + '.hdf5')
         print('\t - Weights of synaptic connections: ' + weightsFilePath)
         self._model.save(weightsFilePath)
 
