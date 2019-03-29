@@ -1,5 +1,31 @@
 try:
     from .model import NNModel
+
+    from PIL import Image
+    from scipy.misc import imsave, imresize
+
+    # Importing the required Keras modules containing models, layers, optimizers, losses, etc
+    from keras.models import Model
+    from keras.layers import Input, Conv2D, Dropout, MaxPooling2D, UpSampling2D, Concatenate, Activation
+    from keras.layers.normalization import BatchNormalization
+    from keras.layers.core import Reshape, Permute
+    from keras.preprocessing.image import img_to_array, load_img, array_to_img
+    from keras.optimizers import Adam, RMSprop
+    from keras.losses import categorical_crossentropy, sparse_categorical_crossentropy, binary_crossentropy
+    from keras.metrics import categorical_accuracy, sparse_categorical_accuracy, binary_accuracy
+
+    from os import listdir
+    from os.path import isfile, exists, join, realpath
+    from os.path import split as pathsplit
+    from random import randint
+
+    import tensorflow as tf
+
+    import matplotlib.pyplot as plt
+
+    import numpy as np
+
+    from image import transfromXY
 except ImportError as err:
     exit(err)
 
@@ -24,7 +50,7 @@ class AerialRoadsModel(NNModel):
         # Input data shape
         self.input_shape = (336, 336, 3)
         # File extensions for data to predict
-        self.FILE_EXTENSIONS  = [
+        self.FILE_EXTENSIONS = [
             "png",
             "jpg",
             "jpeg",
@@ -36,8 +62,7 @@ class AerialRoadsModel(NNModel):
         """
         Creates each layer of the model.
         """
-        #base_dir  = "C:/Users/e_sgouge/Documents/Etienne/Python/analyze_images/datas/aerial_roads"
-        base_dir  = "D:/Documents/Programmation/Python/analyze_images/datas/aerial_roads"
+        base_dir  = join(realpath(__file__).split("src")[0], "datas/aerial_roads")
         train_dir = join(base_dir, "training")
         val_dir   = join(base_dir, "validation")
         test_dir  = join(base_dir, "testing")
@@ -69,7 +94,7 @@ class AerialRoadsModel(NNModel):
                     index = randint(0, len(x_files)-1)
 
                     # MUST be true (files must have the same name)
-                    assert pathsplit(x_files[index])[-1] == pathsplit(y_files[index])[-1]
+                    assert pathsplit(x_files[index].split(".")[0])[-1] == pathsplit(y_files[index].split(".")[0])[-1]
 
                     x_img = img_to_array(load_img(x_files[index]))
                     y_img = img_to_array(load_img(y_files[index]))
@@ -265,10 +290,9 @@ class AerialRoadsModel(NNModel):
         # Learning rate
         learning_rate = 1e-4
         # Compiling the model with an optimizer and a loss function
-        self._model.compile(optimizer=RMSprop(lr=learning_rate),
+        self._model.compile(optimizer=RMSprop(lr=learning_rate, decay=learning_rate/epochs),
                         loss=binary_crossentropy,
-                        metrics=["accuracy"],
-                        decay=learning_rate/epochs)
+                        metrics=["accuracy"])
 
         # Fitting the model by using our train and validation data
         # It returns the history that can be plot in the future

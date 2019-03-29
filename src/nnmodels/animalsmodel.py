@@ -35,8 +35,7 @@ class AnimalsModel(NNModel):
         """
         Creates each layer of the model.
         """
-        #base_dir  = "C:/Users/e_sgouge/Documents/Etienne/Python/analyze_images/datas/dogs_vs_cats"
-        base_dir  = "D:/Documents/Programmation/Python/analyze_images/datas/dogs_vs_cats"
+        base_dir  = join(realpath(__file__).split("src")[0], "datas/dogs_vs_cats")
         train_dir = join(base_dir, "training")
         val_dir   = join(base_dir, "validation")
         test_dir  = join(base_dir, "testing")
@@ -104,10 +103,9 @@ class AnimalsModel(NNModel):
         # Learning rate
         learning_rate = 1e-3
         # Compiling the model with an optimizer and a loss function
-        self._model.compile(optimizer=Adam(lr=learning_rate),
+        self._model.compile(optimizer=Adam(lr=learning_rate, decay=learning_rate/epochs),
                         loss=categorical_crossentropy,
-                        metrics=[categorical_accuracy],
-                        decay=learning_rate/epochs)
+                        metrics=[categorical_accuracy])
 
         # Fitting the model by using our train and validation data
         # It returns the history that can be plot in the future

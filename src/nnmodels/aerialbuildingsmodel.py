@@ -50,7 +50,7 @@ class AerialBuildingsModel(NNModel):
         # Input data shape
         self.input_shape = (336, 336, 3)
         # File extensions for data to predict
-        self.FILE_EXTENSIONS  = [
+        self.FILE_EXTENSIONS = [
             "png",
             "jpg",
             "jpeg",
@@ -62,8 +62,7 @@ class AerialBuildingsModel(NNModel):
         """
         Creates each layer of the model.
         """
-        #base_dir  = "C:/Users/e_sgouge/Documents/Etienne/Python/analyze_images/datas/aerial_buildings"
-        base_dir  = "D:/Documents/Programmation/Python/analyze_images/datas/aerial_buildings"
+        base_dir  = join(realpath(__file__).split("src")[0], "datas/aerial_buildings")
         train_dir = join(base_dir, "training")
         val_dir   = join(base_dir, "validation")
 
@@ -308,10 +307,9 @@ class AerialBuildingsModel(NNModel):
         # Learning rate
         learning_rate = 1e-4
         # Compiling the model with an optimizer and a loss function
-        self._model.compile(optimizer=RMSprop(lr=learning_rate),
+        self._model.compile(optimizer=RMSprop(lr=learning_rate, decay=learning_rate/epochs),
                         loss=binary_crossentropy,
-                        metrics=["accuracy"],
-                        decay=learning_rate/epochs)
+                        metrics=["accuracy"])
 
         # Fitting the model by using our train and validation data
         # It returns the history that can be plot in the future
