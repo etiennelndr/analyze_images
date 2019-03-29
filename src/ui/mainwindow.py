@@ -266,11 +266,12 @@ class MainWindow(QMainWindow):
         Opens an existing file.
         """
         # Set options
-        options = QFileDialog.Options()
+        options = QFileDialog.Options() # No option
         # Get file path
-        filename, _ = QFileDialog.getOpenFileName(self, "Open File", "","PNG Files (*.png);;JPG Files (*.jpg;*.jpeg);;TIF Files (*.tif);;HDR Files (*.hdr);;NII Files (*.nii);;All Files (*)", options=options)
+        filename, _ = QFileDialog.getOpenFileName(self, "Open File", "",self.__model.concatenateExtensions(), options=options)
         if filename.endswith(tuple([self.__model.FILE_EXTENSIONS])):
             self.__imgToPredict = filename
+            # Load in the model
             self.__model.loadDataToPredict(filename)
         else:
             print("ERROR: wrong file extension.")
