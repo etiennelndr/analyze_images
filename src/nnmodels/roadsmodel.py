@@ -65,8 +65,6 @@ class RoadsModel(NNModel):
             x_dir = join(dir, "x")
             y_dir = join(dir, "y")
 
-            nbr_of_files = len([n for n in listdir(x_dir) if isfile(join(x_dir, n))])
-
             assert exists(x_dir) == True
             assert exists(y_dir) == True
 

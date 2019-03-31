@@ -78,10 +78,6 @@ class AerialRoadsModel(NNModel):
             assert exists(x_dir) == True
             assert exists(y_dir) == True
 
-            nbr_of_files = len([n for n in listdir(x_dir) if isfile(join(x_dir, n))])
-
-            assert nbr_of_files % batch_size == 0
-
             x_files = [join(x_dir, n) for n in listdir(x_dir) if isfile(join(x_dir, n))]
             y_files = [join(y_dir, n) for n in listdir(y_dir) if isfile(join(y_dir, n))]
             
@@ -290,7 +286,7 @@ class AerialRoadsModel(NNModel):
         # Learning rate
         learning_rate = 1e-4
         # Compiling the model with an optimizer and a loss function
-        self._model.compile(optimizer=RMSprop(lr=learning_rate, decay=learning_rate/epochs),
+        self._model.compile(optimizer=RMSprop(lr=learning_rate),#, decay=learning_rate/epochs),
                         loss=binary_crossentropy,
                         metrics=["accuracy"])
 
