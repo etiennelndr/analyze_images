@@ -12,8 +12,8 @@ class KidneysModel(NNModel):
 
     Sources:
         - kidney MRI and segmentations: https://github.com/neheller/kits19
-
-    In the segmentation, a value of 0 represents background, 1 represents kidney, and 2 represents tumor.
+        In the segmentation, a value of 0 represents background, 1 represents 
+        kidney, and 2 represents tumor.
     """
 
     def __init__(self):

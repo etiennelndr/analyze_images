@@ -269,7 +269,7 @@ class MainWindow(QMainWindow):
         options = QFileDialog.Options() # No option
         # Get file path
         filename, _ = QFileDialog.getOpenFileName(self, "Open File", "",self.__model.concatenateExtensions(), options=options)
-        if filename.endswith(tuple([self.__model.FILE_EXTENSIONS])):
+        if filename.endswith(tuple(self.__model.FILE_EXTENSIONS)):
             self.__imgToPredict = filename
             # Load in the model
             self.__model.loadDataToPredict(filename)
