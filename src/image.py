@@ -1,7 +1,7 @@
 try:
     from skimage.transform import rotate
     from skimage.util import random_noise
-    from numpy import fliplr, mean, amax
+    import numpy as np
     from random import uniform, choice, randint
     from PIL import Image
 except ImportError as err:
@@ -38,7 +38,7 @@ def _flipXY(x, y):
     """
     Flips x and y.
     """
-    return fliplr(x), fliplr(y)
+    return np.fliplr(x), np.fliplr(y)
 
 def _randomRotationXY(x, y, rot=10):
     """
@@ -55,7 +55,7 @@ def _randomNoiseXY(x, y):
     Adds random noise to x but nothing to y.
     """
     nx = random_noise(x)*255.0
-    if mean(nx) > mean(x)+10:
+    if np.mean(nx) > np.mean(x)+10:
         # Return x and y because random_noise returned a white image.
         return x, y
 
