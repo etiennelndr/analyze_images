@@ -3,7 +3,7 @@ try:
     from skimage.util import random_noise
     import numpy as np
     from random import uniform, choice, randint
-    from PIL import Image
+    from keras.preprocessing.image import array_to_img
 except ImportError as err:
     exit(err)
 
@@ -65,11 +65,15 @@ def _randomZoomXY(x, y):
     """
     Zooms randomly on x and y. The same zoom is applied on both images.
     """
-    random_zoom = randint(0, min(x.shape[:2] + y.shape[:2])/2)
+    print("normal:", x.shape, y.shape)
+    print(int(min(x.shape[:2] + y.shape[:2])/2))
+    random_zoom = randint(0, int(min(x.shape[:2] + y.shape[:2])/2))
+    print(random_zoom)
     x_zoomed = x[random_zoom:x.shape[0]-random_zoom, random_zoom:x.shape[1]-random_zoom, :]
     y_zoomed = y[random_zoom:y.shape[0]-random_zoom, random_zoom:y.shape[1]-random_zoom, :]
-    x = np.array(Image.fromarray(x_zoomed).resize(x.shape[:2][::-1]))
-    y = np.array(Image.fromarray(y_zoomed).resize(y.shape[:2][::-1]))
+    print("zoomed:", x_zoomed.shape, y_zoomed.shape)
+    x = np.array(array_to_img(x_zoomed).resize(x.shape[:2][::-1]))
+    y = np.array(array_to_img(y_zoomed).resize(y.shape[:2][::-1]))
     return x, y
 
 DATA_AUGMENTATION_FUNCTION = {
@@ -85,7 +89,6 @@ DATA_AUGMENTATION_FUNCTION = {
 if __name__ == "__main__":
     # Imports for testing
     try:
-        import numpy as np
         from PIL import Image
         from os.path import exists, join
         from os import mkdir
