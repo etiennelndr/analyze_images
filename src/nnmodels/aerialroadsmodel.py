@@ -316,7 +316,7 @@ class AerialRoadsModel(NNModel):
         self._training = True
 
         # Number of epochs
-        epochs = 3
+        epochs = 10
         # Learning rate
         learning_rate = 1e-4
         # Compiling the model with an optimizer and a loss function

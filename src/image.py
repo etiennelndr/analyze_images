@@ -23,7 +23,8 @@ def transfromXY(x, y):
     #x, y = addNoiseOrNot(x, y)
 
     # Zoom (or not) on both images
-    zoomOrNot =  DATA_AUGMENTATION_FUNCTION[choice([functions[0], functions[2]])]
+    zoomOrNot = DATA_AUGMENTATION_FUNCTION[choice([functions[0], functions[4]])]
+    x, y = zoomOrNot(x, y)
 
     return x, y
 
