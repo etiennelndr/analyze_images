@@ -282,7 +282,7 @@ class AerialRoadsModel(NNModel):
         self._training = True
 
         # Number of epochs
-        epochs = 10
+        epochs = 20
         # Learning rate
         learning_rate = 1e-4
         # Compiling the model with an optimizer and a loss function
@@ -311,7 +311,7 @@ class AerialRoadsModel(NNModel):
 
         if "test_generator" in self.datas:
             # Evaluation of the model
-            self._model.evaluate_generator(self.datas["test_generator"], steps=50, verbose=1)
+            self._model.evaluate_generator(self.datas["test_generator"], steps=500, verbose=1)
 
         # Training is over
         self._training = False
