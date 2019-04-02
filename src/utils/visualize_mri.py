@@ -1,6 +1,6 @@
 try:
     from os import listdir
-    from nibabel import load
+    import nibabel as nib
     from numpy import rot90, transpose, array
     import matplotlib.pyplot as plt
     from random import randrange
@@ -23,13 +23,13 @@ if __name__ == "main__":
     data_all = []
     #for data_file in files:
     #    if data_file[-3:] == "hdr" or data_file[-3:] == "nii":
-    #        data = nibabel.load(data_path + data_file).get_data()
+    #        data = nib.load(data_path + data_file).get_data()
     #        print(data.shape)
     #        data_all.append(data)#.reshape(x_size, y_size, n_slice))
     #        break
     i = randrange(0, len(files))
     print(i)
-    data = load(data_path + files[i]).get_data()
+    data = nib.load(data_path + files[i]).get_data()
     data_all.append(data)
 
     print(array(data_all).shape)

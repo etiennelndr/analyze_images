@@ -111,7 +111,15 @@ datas/**
 # Visual Studio project files
 *.pyproj
 *.sln
-src/.vs/src/v15/.suo
+src/.vs
+/src/v15/.suo
+
+
 *.TMP
+
+
 *.hdf5
+
 *.json
+
+tests/**

@@ -27,8 +27,8 @@ class KidneysModel(NNModel):
 
         # File extensions for data to predict
         self.FILE_EXTENSIONS  = [
-            "nii",
             "nii.gz",
+            "nii",
             "hdr"
         ]
 
@@ -52,12 +52,15 @@ class KidneysModel(NNModel):
         self.__filename = filename
         # Open the desired picture
         irm = nib.load(filename)
+        print(irm.affine)
         # Get the image array
         self.__imgToPredict = irm.get_fdata()
         # Be careful -> each pixel value must be a float
         self.__imgToPredict = self.__imgToPredict.astype("float32")
+
+        print(self.__imgToPredict.shape)
         # Normalize the image
-        self.__imgToPredict /= 255                          # TODO: change this value
+        #self.__imgToPredict /= 255                          # TODO: change this value
 
     def predictValue(self):
         """

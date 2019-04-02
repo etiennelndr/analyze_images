@@ -2,13 +2,14 @@ try:
     from skimage.transform import rotate
     from skimage.util import random_noise
     from numpy import fliplr, mean, amax
-    from random import uniform, choice
+    from random import uniform, choice, randint
+    from PIL import Image
 except ImportError as err:
     exit(err)
 
 def transfromXY(x, y):
     """
-    Apply a random transformation on x and y.
+    Applies random transformations on x and y.
     """
     functions = list(DATA_AUGMENTATION_FUNCTION)
     # Flip (or not) both images
@@ -20,6 +21,9 @@ def transfromXY(x, y):
     # Add noise (or not) to the first image
     #addNoiseOrNot = DATA_AUGMENTATION_FUNCTION[choice([functions[0], functions[3]])]
     #x, y = addNoiseOrNot(x, y)
+
+    # Zoom (or not) on both images
+    zoomOrNot =  DATA_AUGMENTATION_FUNCTION[choice([functions[0], functions[2]])]
 
     return x, y
 
@@ -41,9 +45,8 @@ def _randomRotationXY(x, y, rot=10):
     """
     # Pick a random degree of rotation between 25% on the left and 25% on the right
     rand_deg = uniform(-rot, rot)
-    # FIX: set parameter "preserve_range" to True to have values in [0;255] instead of [0;1].
+    # IMPORTANT: set parameter "preserve_range" to True to have values in [0;255] instead of [0;1].
     x, y = rotate(x, rand_deg, preserve_range=True), rotate(y, rand_deg, preserve_range=True)
-    # Because of rotation we can have black areas -> we have to delete them
     return x, y
 
 def _randomNoiseXY(x, y):
@@ -57,11 +60,25 @@ def _randomNoiseXY(x, y):
 
     return nx, y
 
+def _randomZoomXY(x, y):
+    """
+    Zooms randomly on x and y. The same zoom is applied on both images.
+    """
+    random_zoom = randint(0, min(x.shape[:2] + y.shape[:2])/2)
+    x_zoomed = x[random_zoom:x.shape[0]-random_zoom, random_zoom:x.shape[1]-random_zoom, :]
+    y_zoomed = y[random_zoom:y.shape[0]-random_zoom, random_zoom:y.shape[1]-random_zoom, :]
+    x = np.array(Image.fromarray(x_zoomed).resize(x.shape[:2][::-1]))
+    y = np.array(Image.fromarray(y_zoomed).resize(y.shape[:2][::-1]))
+    return x, y
+
 DATA_AUGMENTATION_FUNCTION = {
+    # No transformation
     'returnXY'         : _returnXY,
+    # Transformations
     'flipXY'           : _flipXY,
     'randomRotationXY' : _randomRotationXY,
-    'randomNoiseXY'    : _randomNoiseXY
+    'randomNoiseXY'    : _randomNoiseXY,
+    'randomZoomXY'     : _randomZoomXY
 }
 
 if __name__ == "__main__":
@@ -70,18 +87,23 @@ if __name__ == "__main__":
         import numpy as np
         from PIL import Image
         from os.path import exists, join
+        from os import mkdir
         from scipy.misc import imsave
     except ImportError as err:
         exit(err)
 
     # Main directory of the images
-    dir_path = "C:/Users/e_sgouge/Documents/Etienne/Python/Reconnaissance_chiffre"
-    filename = "qd3.jpg"
-    file     = join(dir_path, filename)
+    dir_path   = "C:/Users/e_sgouge/Documents/Etienne/Python/analyze_images"
+    filename   = "route_2.jpg"
+    file       = join(dir_path, filename)
+    output_dir = join(dir_path, "tests")
 
     # Check if file and directory exist
     assert exists(dir_path) == True
     assert exists(file)     == True
+
+    if not exists(output_dir):
+        mkdir(output_dir)
 
     # Open the image
     img = Image.open(file)
@@ -91,16 +113,22 @@ if __name__ == "__main__":
     # FLIP
     x_flip, y_flip = _flipXY(x, y)
 
-    imsave(join(dir_path, "flip_x_" + filename), x_flip)
-    imsave(join(dir_path, "flip_y_" + filename), y_flip)
+    imsave(join(output_dir, "flip_x_" + filename), x_flip)
+    imsave(join(output_dir, "flip_y_" + filename), y_flip)
 
     # ROTATE
     x_rot, y_rot = _randomRotationXY(x, y)
 
-    imsave(join(dir_path, "rot_x_" + filename), x_rot)
-    imsave(join(dir_path, "rot_y_" + filename), y_rot)
+    imsave(join(output_dir, "rot_x_" + filename), x_rot)
+    imsave(join(output_dir, "rot_y_" + filename), y_rot)
 
     # NOISE
     x_noise, _ = _randomNoiseXY(x, y)
 
-    imsave(join(dir_path, "noise_x_" + filename), x_noise)
+    imsave(join(output_dir, "noise_x_" + filename), x_noise)
+
+    # ZOOM
+    x_zoom, y_zoom = _randomZoomXY(x, y)
+
+    imsave(join(output_dir, "zoom_x_" + filename), x_zoom)
+    imsave(join(output_dir, "zoom_y_" + filename), y_zoom)

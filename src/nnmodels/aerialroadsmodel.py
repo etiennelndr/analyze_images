@@ -163,14 +163,14 @@ class AerialRoadsModel(NNModel):
         conv3  = Conv2D(64, (3, 3), padding='same', data_format='channels_last', name='conv3_1')(pool2)
         print("conv3:", conv3.shape)
         bnor3  = BatchNormalization(name='bnor3_1')(conv3)
-        acti3  = Activation(tf.nn.relu, name='acti3_1')(bnor3)#
-        # Dropout of 0.2
-        drop3  = Dropout(0.2, name='drop3_1')(acti3)
-        # 3x3 Convolution
-        conv3  = Conv2D(64, (3, 3), padding='same', data_format='channels_last', name='conv3_2')(drop3)
-        print("conv3:", conv3.shape)
-        bnor3  = BatchNormalization(name='bnor3_2')(conv3)
-        acti3  = Activation(tf.nn.relu, name='acti3_2')(bnor3)
+        acti3  = Activation(tf.nn.relu, name='acti3_1')(bnor3)
+        ## Dropout of 0.2
+        #drop3  = Dropout(0.2, name='drop3_1')(acti3)
+        ## 3x3 Convolution
+        #conv3  = Conv2D(64, (3, 3), padding='same', data_format='channels_last', name='conv3_2')(drop3)
+        #print("conv3:", conv3.shape)
+        #bnor3  = BatchNormalization(name='bnor3_2')(conv3)
+        #acti3  = Activation(tf.nn.relu, name='acti3_2')(bnor3)
         # Dropout of 0.2
         drop3  = Dropout(0.2, name='drop3_2')(acti3)
         # 3x3 Convolution
@@ -181,23 +181,57 @@ class AerialRoadsModel(NNModel):
         # 2x2 Max Pooling
         pool3  = MaxPooling2D(pool_size=(2, 2), name='pool3_1')(acti3)
 
+        # --------------- TEST ---------------
+        # 3x3 Convolution
+        conv3  = Conv2D(128, (3, 3), padding='same', data_format='channels_last', name='test_conv3_1')(pool3)
+        print("conv3:", conv3.shape)
+        bnor3  = BatchNormalization(name='test_bnor3_1')(conv3)
+        test_acti3  = Activation(tf.nn.relu, name='test_acti3_1')(bnor3)
+        # Dropout of 0.2
+        drop3  = Dropout(0.2, name='test_drop3_2')(test_acti3)
+        # 3x3 Convolution
+        conv3  = Conv2D(128, (3, 3), padding='same', data_format='channels_last', name='test_conv3_3')(drop3)
+        print("conv3:", conv3.shape)
+        bnor3  = BatchNormalization(name='test_bnor3_3')(conv3)
+        test_acti3  = Activation(tf.nn.relu, name='test_acti3_3')(bnor3)
+        # 2x2 Max Pooling
+        pool3  = MaxPooling2D(pool_size=(2, 2), name='test_pool3_1')(test_acti3)
+
         # ----- Fourth Convolution -----
         # 3x3 Convolution
-        conv4  = Conv2D(128, (3, 3), padding='same', data_format='channels_last', name='conv4_1')(pool3)
+        conv4  = Conv2D(256, (3, 3), padding='same', data_format='channels_last', name='conv4_1')(pool3)
         print("conv4:", conv4.shape)
         bnor4  = BatchNormalization(name='bnor4_1')(conv4)
         acti4  = Activation(tf.nn.relu, name='acti4_1')(bnor4)
         # Dropout of 0.25
         drop4  = Dropout(0.25, name='drop4_1')(acti4)
         # 3x3 Convolution
-        conv4  = Conv2D(128, (3, 3), padding='same', data_format='channels_last', name='conv4_2')(drop4)
+        conv4  = Conv2D(256, (3, 3), padding='same', data_format='channels_last', name='conv4_2')(drop4)
         print("conv4:", conv4.shape)
         bnor4  = BatchNormalization(name='bnor4_2')(conv4)
         acti4  = Activation(tf.nn.relu, name='acti4_2')(bnor4)
 
+        # --------------- TEST ---------------
+        # 2x2 Up Sampling
+        upsp5  = UpSampling2D(size = (2,2), name='test_upsp5_1')(acti4)
+        # Concatenation
+        conc5  = Concatenate(axis=3, name='test_conc5_1')([upsp5, test_acti3])
+        # 3x3 Convolution
+        conv5  = Conv2D(128, (3, 3), padding='same', data_format='channels_last', name='test_conv5_1')(conc5)
+        print("conv5:", conv5.shape)
+        bnor5  = BatchNormalization(name='test_bnor5_1')(conv5)
+        acti5  = Activation(tf.nn.relu, name='test_acti5_1')(bnor5)
+        # Dropout of 0.2
+        drop5  = Dropout(0.2, name='test_drop5_2')(acti5)
+        # 3x3 Convolution
+        conv5  = Conv2D(128, (3, 3), padding='same', data_format='channels_last', name='test_conv5_3')(drop5)
+        print("conv5:", conv5.shape)
+        bnor5  = BatchNormalization(name='test_bnor5_3')(conv5)
+        acti5  = Activation(tf.nn.relu, name='test_acti5_3')(bnor5)
+
         # ----- Fifth Convolution - Up Sampling -----
         # 2x2 Up Sampling
-        upsp5  = UpSampling2D(size = (2,2), name='upsp5_1')(acti4)
+        upsp5  = UpSampling2D(size = (2,2), name='upsp5_1')(acti5)#(acti4)
         # Concatenation
         conc5  = Concatenate(axis=3, name='conc5_1')([upsp5, acti3])
         # 3x3 Convolution
@@ -205,13 +239,13 @@ class AerialRoadsModel(NNModel):
         print("conv5:", conv5.shape)
         bnor5  = BatchNormalization(name='bnor5_1')(conv5)
         acti5  = Activation(tf.nn.relu, name='acti5_1')(bnor5)
-        # Dropout of 0.2
-        drop5  = Dropout(0.2, name='drop5_1')(acti5)
-        # 3x3 Convolution
-        conv5  = Conv2D(64, (3, 3), padding='same', data_format='channels_last', name='conv5_2')(drop5)
-        print("conv5:", conv5.shape)
-        bnor5  = BatchNormalization(name='bnor5_2')(conv5)
-        acti5  = Activation(tf.nn.relu, name='acti5_2')(bnor5)
+        ## Dropout of 0.2
+        #drop5  = Dropout(0.2, name='drop5_1')(acti5)
+        ## 3x3 Convolution
+        #conv5  = Conv2D(64, (3, 3), padding='same', data_format='channels_last', name='conv5_2')(drop5)
+        #print("conv5:", conv5.shape)
+        #bnor5  = BatchNormalization(name='bnor5_2')(conv5)
+        #acti5  = Activation(tf.nn.relu, name='acti5_2')(bnor5)
         # Dropout of 0.2
         drop5  = Dropout(0.2, name='drop5_2')(acti5)
         # 3x3 Convolution
@@ -282,11 +316,11 @@ class AerialRoadsModel(NNModel):
         self._training = True
 
         # Number of epochs
-        epochs = 20
+        epochs = 3
         # Learning rate
         learning_rate = 1e-4
         # Compiling the model with an optimizer and a loss function
-        self._model.compile(optimizer=RMSprop(lr=learning_rate),#, decay=learning_rate/epochs),
+        self._model.compile(optimizer=Adam(lr=learning_rate),#, decay=learning_rate/epochs),
                         loss=binary_crossentropy,
                         metrics=["accuracy"])
 
@@ -311,7 +345,8 @@ class AerialRoadsModel(NNModel):
 
         if "test_generator" in self.datas:
             # Evaluation of the model
-            self._model.evaluate_generator(self.datas["test_generator"], steps=500, verbose=1)
+            testLoss, acc_test = self._model.evaluate_generator(self.datas["test_generator"], steps=500, verbose=1)
+            print("Loss / test: " + str(testLoss) + " and accuracy: " + str(acc_test))
 
         # Training is over
         self._training = False
@@ -356,7 +391,7 @@ class AerialRoadsModel(NNModel):
             for j in range(int(real_shape[1]/500)):
                 print(i,j)
                 # Get a sub-array of the main array
-                sub_array  = self.__imgToPredict[i*500:(i+1)*500:, j*500:(j+1)*500:, :]
+                sub_array = self.__imgToPredict[i*500:(i+1)*500:, j*500:(j+1)*500:, :]
                 sub_img = array_to_img(sub_array).resize(self.input_shape[:2])
                 # Because array_to_img is modifying array values to [0,255] we have 
                 # to divide each value by 255
