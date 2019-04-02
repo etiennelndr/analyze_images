@@ -119,7 +119,7 @@ class AerialRoadsModel(NNModel):
         # Create a generator for each step
         train_generator = createGenerator(train_dir, 4)
         val_generator   = createGenerator(val_dir,   4)
-        test_generator  = createGenerator(test_dir,  1)
+        test_generator  = createGenerator(test_dir,  4)
 
         # Datas
         self.datas = { "train_generator": train_generator, "val_generator": val_generator, "test_generator": test_generator }
