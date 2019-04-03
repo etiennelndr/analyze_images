@@ -394,12 +394,12 @@ class AerialRoadsModel(NNModel):
         reshaped_img_array = np.array(Image.fromarray(img_array).resize(real_shape[:2][::-1]))
         # If the result for the second value is more than 0.85 -> store a 
         # "green" array for this index
-        reshaped_img_array[pred[:,:,0] > 0.85] = [0, 240, 0]
+        reshaped_img_array[pred[:,:,0] > 0.85] = [240, 0, 0]
         # Because we need to put the segmented road on the real image, we have to
         # reshape the predicted array to the real shape
         reshaped_img_array = np.array(Image.fromarray(reshaped_img_array).resize(real_shape[:2][::-1]))
         # Now, for each element in the picture, replace it or not
-        img_array[reshaped_img_array[:,:,1] == 240] = [0,240,0]
+        img_array[reshaped_img_array[:,:,0] == 240] = [240,0,0]
 
         # Create a new Image instance with the new_img_array array
         new_img = Image.fromarray(img_array.astype('uint8'))
