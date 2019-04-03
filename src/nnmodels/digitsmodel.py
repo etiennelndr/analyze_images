@@ -1,7 +1,7 @@
 try:
     from .model import NNModel
 
-    from keras.layers import Conv2D, Dropout, MaxPooling2D, Flatten, Dense
+    from keras.layers import Conv2D, Dropout, MaxPooling2D, Flatten, Dense, BatchNormalization, Activation
     from keras.losses import sparse_categorical_crossentropy
     from keras.metrics import sparse_categorical_accuracy
     from keras.optimizers import Adam
@@ -48,12 +48,23 @@ class DigitsModel(NNModel):
         x_val   /= 255
 
         # Add layers to the model
+        # 3x3 Convolution
         self.addLayer(Conv2D(36, kernel_size=(3,3), input_shape=self.input_shape))
+        self.addLayer(BatchNormalization())
+        self.addLayer(Activation(tf.nn.relu))
+        # Dropout of 0.2
+        self.addLayer(Dropout(0.2))
+        # 2x2 Max Pooling
         self.addLayer(MaxPooling2D(pool_size=(2,2)))
+        # 3x3 Convolution
         self.addLayer(Conv2D(28, kernel_size=(2,2)))
+        self.addLayer(BatchNormalization())
+        self.addLayer(Activation(tf.nn.relu))
+         # 2x1 Max Pooling
         self.addLayer(MaxPooling2D(pool_size=(2,1)))
         self.addLayer(Flatten())
         self.addLayer(Dense(128, activation=tf.nn.relu))
+        # Dropout of 0.2
         self.addLayer(Dropout(0.2))
         self.addLayer(Dense(10, activation=tf.nn.softmax))
 
@@ -91,7 +102,6 @@ class DigitsModel(NNModel):
 
         if "x_test" in self.datas and "y_test" in self.datas:
             # Evaluate the model
-            self._model.evaluate(self.datas["x_test"], self.datas["y_test"])
 
         # Training is over
         self._training = False
