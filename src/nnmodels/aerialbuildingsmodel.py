@@ -328,7 +328,8 @@ class AerialBuildingsModel(NNModel):
 
         if "test_generator" in self.datas:
             # Evaluation of the model
-            self._model.evaluate_generator(self.datas["test_generator"], steps=50, verbose=1)
+            testLoss, acc_test = self._model.evaluate_generator(self.datas["test_generator"], steps=250, verbose=1)
+            print("Loss / test: " + str(testLoss) + " and accuracy: " + str(acc_test))
 
         # Training is over
         self._training = False

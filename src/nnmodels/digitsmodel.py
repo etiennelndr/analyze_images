@@ -102,6 +102,8 @@ class DigitsModel(NNModel):
 
         if "x_test" in self.datas and "y_test" in self.datas:
             # Evaluate the model
+            testLoss, acc_test = self._model.evaluate(self.datas["x_test"], self.datas["y_test"])
+            print("Loss / test: " + str(testLoss) + " and accuracy: " + str(acc_test))
 
         # Training is over
         self._training = False
