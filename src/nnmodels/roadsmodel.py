@@ -15,7 +15,7 @@ try:
     from keras.metrics import categorical_accuracy, sparse_categorical_accuracy, binary_accuracy
 
     from os import listdir
-    from os.path import isfile, exists, join
+    from os.path import isfile, exists, join, realpath
     from os.path import split as pathsplit
     from random import randint
 

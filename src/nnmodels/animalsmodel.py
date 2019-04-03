@@ -7,6 +7,8 @@ try:
     from keras.losses import categorical_crossentropy
     from keras.metrics import categorical_accuracy
 
+    from os.path import realpath
+
     import tensorflow as tf
     import numpy as np
 
