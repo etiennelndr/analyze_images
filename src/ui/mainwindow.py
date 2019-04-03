@@ -2,6 +2,9 @@ try:
     import sys
     from datetime import datetime
 
+    from os.path import join
+    from os import makedirs
+
     # Design
     from .design import Ui_MainWindow
 
@@ -336,15 +339,15 @@ class MainWindow(QMainWindow):
         #self.__ui.stopModelCreationBtn.setEnabled(False)
 
         if ret:
-            filename = self.__data_to_process + datetime.now().strftime("_%H-%M-%S_%d-%m-%y")
+            self.savedModelFilename = self.__data_to_process + datetime.now().strftime("_%H-%M-%S_%d-%m-%y")
             # Save the model with the given name
-            self.__model.saveModel(filename)
+            self.__model.saveModel(self.savedModelFilename)
             print("Model saved.")
 
             # Allow the use of the model
             self.__isModelLoaded = True
 
-            self.__ui.currentModel.setText(filename)
+            self.__ui.currentModel.setText(self.savedModelFilename)
 
         print("DONE")
 
@@ -391,16 +394,25 @@ class MainWindow(QMainWindow):
             ax1, ax2 = self.__figure.subplots(1, 2)
 
             # Plot datas
+            # Accuracy
             ax1.plot(x_acc)
             ax1.plot(x_val_acc)
             ax1.set_xlabel("epoch")
             ax1.set_ylabel("accuracy")
             ax1.set_title("Training and validation accuracy")
+            # Loss
             ax2.plot(x_loss)
             ax2.plot(x_val_loss)
             ax2.set_xlabel("epoch")
             ax2.set_ylabel("loss")
             ax2.set_title("Training and validation loss")
+
+            # Create a new directory if it doesn't exist
+            dir = "models/figures"
+            makedirs(dir, exist_ok=True)
+            # Save the figure
+            filename = self.savedModelFilename + ".png"
+            self.__figure.savefig(join(dir, filename))
 
             # Refresh canvas
             self.__canvas.draw()
