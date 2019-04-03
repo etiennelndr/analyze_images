@@ -24,8 +24,8 @@ class NNModel(object):
 
     # Different model types
     _MODEL_TYPES = {
-        'sequential': Sequential, 
-        'model'     : Model
+        'sequential': Sequential(), 
+        'model'     : Model()
     }
 
     # Constructor
@@ -144,11 +144,11 @@ class NNModel(object):
         """
         Saves a model.
         """
-        architectureFilePath = basename + '.json'
-        print('\t - Architecture of the neural network: ' + architectureFilePath)
-
         if not exists(dir):
             makedirs(dir) # Create a new directory if it doesn't exist
+
+        architectureFilePath = basename + '.json'
+        print('\t - Architecture of the neural network: ' + architectureFilePath)
 
         with open(join(dir, architectureFilePath), 'wt') as json_file:
             architecture = self._model.to_json()
