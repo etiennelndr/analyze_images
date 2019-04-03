@@ -181,7 +181,7 @@ class AerialRoadsModel(NNModel):
         # 2x2 Max Pooling
         pool3  = MaxPooling2D(pool_size=(2, 2), name='pool3_1')(acti3)
 
-        # --------------- TEST ---------------
+        # ----- Fourth Convolution -----
         # 3x3 Convolution
         conv3  = Conv2D(128, (3, 3), padding='same', data_format='channels_last', name='test_conv3_1')(pool3)
         print("conv3:", conv3.shape)
@@ -197,7 +197,7 @@ class AerialRoadsModel(NNModel):
         # 2x2 Max Pooling
         pool3  = MaxPooling2D(pool_size=(2, 2), name='test_pool3_1')(test_acti3)
 
-        # ----- Fourth Convolution -----
+        # ----- Fifth Convolution -----
         # 3x3 Convolution
         conv4  = Conv2D(256, (3, 3), padding='same', data_format='channels_last', name='conv4_1')(pool3)
         print("conv4:", conv4.shape)
@@ -211,7 +211,7 @@ class AerialRoadsModel(NNModel):
         bnor4  = BatchNormalization(name='bnor4_2')(conv4)
         acti4  = Activation(tf.nn.relu, name='acti4_2')(bnor4)
 
-        # --------------- TEST ---------------
+        # ----- Sixth Convolution -----
         # 2x2 Up Sampling
         upsp5  = UpSampling2D(size = (2,2), name='test_upsp5_1')(acti4)
         # Concatenation
@@ -229,7 +229,7 @@ class AerialRoadsModel(NNModel):
         bnor5  = BatchNormalization(name='test_bnor5_3')(conv5)
         acti5  = Activation(tf.nn.relu, name='test_acti5_3')(bnor5)
 
-        # ----- Fifth Convolution - Up Sampling -----
+        # ----- Seventh Convolution - Up Sampling -----
         # 2x2 Up Sampling
         upsp5  = UpSampling2D(size = (2,2), name='upsp5_1')(acti5)#(acti4)
         # Concatenation
@@ -254,56 +254,56 @@ class AerialRoadsModel(NNModel):
         bnor5  = BatchNormalization(name='bnor5_3')(conv5)
         acti5  = Activation(tf.nn.relu, name='acti5_3')(bnor5)
 
-        # ----- Sixth Convolution - Up Sampling -----
+        # ----- Eighth Convolution - Up Sampling -----
         # 2x2 Up Sampling
-        upsp6  = UpSampling2D(size = (2,2), name='upsp6_1')(acti5)
+        upsp8  = UpSampling2D(size = (2,2), name='upsp8_1')(acti5)
         # Concatenation
-        conc6  = Concatenate(axis=3, name='conc6_1')([upsp6, acti2])
+        conc8  = Concatenate(axis=3, name='conc8_1')([upsp8, acti2])
         # 3x3 Convolution
-        conv6  = Conv2D(32, (3, 3), padding='same', data_format='channels_last', name='conv6_1')(conc6)
-        print("conv6:", conv6.shape)
-        bnor6  = BatchNormalization(name='bnor6_1')(conv6)
-        acti6  = Activation(tf.nn.relu, name='acti6_1')(bnor6)
-        # Dropout of 0.2
-        drop6  = Dropout(0.2, name='drop6_1')(acti6)
-        # 3x3 Convolution
-        conv6  = Conv2D(32, (3, 3), padding='same', data_format='channels_last', name='conv6_2')(drop6)
-        print("conv6:", conv6.shape)
-        bnor6  = BatchNormalization(name='bnor6_2')(conv6)
-        acti6  = Activation(tf.nn.relu, name='acti6_2')(bnor6)
-
-        # ----- Seventh Convolution - Up Sampling -----
-        # 2x2 Up Sampling
-        upsp7  = UpSampling2D(size = (2,2), name='upsp7_1')(acti6)
-        # Concatenation
-        conc7  = Concatenate(axis=3, name='conc7_1')([upsp7, acti1])
-        # 3x3 Convolution
-        conv7  = Conv2D(16, (3, 3), padding='same', data_format='channels_last', name='conv7_1')(conc7)
-        print("conv7:", conv7.shape)
-        bnor7  = BatchNormalization(name='bnor7_1')(conv7)
-        acti7  = Activation(tf.nn.relu, name='acti7_1')(bnor7)
-        # Dropout of 0.2
-        drop7  = Dropout(0.2, name='drop7_1')(acti7)
-        ## 3x3 Convolution
-        conv7  = Conv2D(16, (3, 3), padding='same', data_format='channels_last', name='conv7_2')(drop7)
-        print("conv7:", conv7.shape)
-        bnor7  = BatchNormalization(name='bnor7_2')(conv7)
-        acti7  = Activation(tf.nn.relu, name='acti7_2')(bnor7)
-
-        # ----- Eighth Convolution (outputs) -----
-        # 3x3 Convolution
-        conv8  = Conv2D(2, (3, 3), padding='same', data_format='channels_last', name='conv8_1')(acti7)
+        conv8  = Conv2D(32, (3, 3), padding='same', data_format='channels_last', name='conv8_1')(conc8)
         print("conv8:", conv8.shape)
         bnor8  = BatchNormalization(name='bnor8_1')(conv8)
-        acti8  = Activation(tf.nn.sigmoid, name='acti8_1')(bnor8)
-        # 1x1 Convolution
-        conv8  = Conv2D(self.__nClasses, (1, 1), padding='same', data_format='channels_last', name='conv8_2')(acti8)
+        acti8  = Activation(tf.nn.relu, name='acti8_1')(bnor8)
+        # Dropout of 0.2
+        drop8  = Dropout(0.2, name='drop8_1')(acti8)
+        # 3x3 Convolution
+        conv8  = Conv2D(32, (3, 3), padding='same', data_format='channels_last', name='conv8_1')(drop8)
         print("conv8:", conv8.shape)
-        bnor8  = BatchNormalization(name='bnor8_2')(conv8)
-        acti8  = Activation(tf.nn.sigmoid, name='acti8_2')(bnor8)
+        bnor8  = BatchNormalization(name='bnor8_1')(conv8)
+        acti8  = Activation(tf.nn.relu, name='acti8_1')(bnor8)
 
-        # Set a new model with the inputs and the outputs (eighth convolution)
-        self.setModel(Model(inputs=inputs, outputs=acti8))
+        # ----- Ninth Convolution - Up Sampling -----
+        # 2x2 Up Sampling
+        upsp9  = UpSampling2D(size = (2,2), name='upsp9_1')(acti8)
+        # Concatenation
+        conc9  = Concatenate(axis=3, name='conc9_1')([upsp9, acti1])
+        # 3x3 Convolution
+        conv9  = Conv2D(16, (3, 3), padding='same', data_format='channels_last', name='conv9_1')(conc9)
+        print("conv9:", conv9.shape)
+        bnor9  = BatchNormalization(name='bnor9_1')(conv9)
+        acti9  = Activation(tf.nn.relu, name='acti9_1')(bnor9)
+        # Dropout of 0.2
+        drop9  = Dropout(0.2, name='drop9_1')(acti9)
+        ## 3x3 Convolution
+        conv9  = Conv2D(16, (3, 3), padding='same', data_format='channels_last', name='conv9_1')(drop9)
+        print("conv9:", conv9.shape)
+        bnor9  = BatchNormalization(name='bnor9_1')(conv9)
+        acti9  = Activation(tf.nn.relu, name='acti9_1')(bnor9)
+
+        # ----- Tenth Convolution (outputs) -----
+        # 3x3 Convolution
+        conv10 = Conv2D(2, (3, 3), padding='same', data_format='channels_last', name='conv10_1')(acti9)
+        print("conv10:", conv10.shape)
+        bnor10 = BatchNormalization(name='bnor10_1')(conv10)
+        acti10 = Activation(tf.nn.sigmoid, name='acti10_1')(bnor10)
+        # 1x1 Convolution
+        conv10 = Conv2D(self.__nClasses, (1, 1), padding='same', data_format='channels_last', name='conv10_2')(acti10)
+        print("conv10:", conv10.shape)
+        bnor10 = BatchNormalization(name='bnor10_2')(conv10)
+        acti10 = Activation(tf.nn.sigmoid, name='acti10_2')(bnor10)
+
+        # Set a new model with the inputs and the outputs (tenth convolution)
+        self.setModel(Model(inputs=inputs, outputs=acti10))
 
         # Get a summary of the previously create model
         self.getModel().summary()
