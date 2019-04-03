@@ -65,13 +65,9 @@ def _randomZoomXY(x, y):
     """
     Zooms randomly on x and y. The same zoom is applied on both images.
     """
-    print("normal:", x.shape, y.shape)
-    print(int(min(x.shape[:2] + y.shape[:2])/2))
-    random_zoom = randint(0, int(min(x.shape[:2] + y.shape[:2])/2))
-    print(random_zoom)
+    random_zoom = randint(0, int(min(x.shape[:2] + y.shape[:2])/4))
     x_zoomed = x[random_zoom:x.shape[0]-random_zoom, random_zoom:x.shape[1]-random_zoom, :]
     y_zoomed = y[random_zoom:y.shape[0]-random_zoom, random_zoom:y.shape[1]-random_zoom, :]
-    print("zoomed:", x_zoomed.shape, y_zoomed.shape)
     x = np.array(array_to_img(x_zoomed).resize(x.shape[:2][::-1]))
     y = np.array(array_to_img(y_zoomed).resize(y.shape[:2][::-1]))
     return x, y
