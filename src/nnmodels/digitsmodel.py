@@ -29,6 +29,14 @@ class DigitsModel(NNModel):
 
         # Input data shape
         self.input_shape = (28, 28, 1)
+        # File extensions for data to predict
+        self.FILE_EXTENSIONS = [
+            "png",
+            "jpg",
+            "jpeg",
+            "tif",
+            "tiff"
+        ]
 
     def createLayers(self):
         """

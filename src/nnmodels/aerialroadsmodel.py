@@ -51,11 +51,11 @@ class AerialRoadsModel(NNModel):
         self.input_shape = (336, 336, 3)
         # File extensions for data to predict
         self.FILE_EXTENSIONS = [
+            "tif",
+            "tiff",
             "png",
             "jpg",
-            "jpeg",
-            "tif",
-            "tiff"
+            "jpeg"
         ]
 
     def createLayers(self):
@@ -125,7 +125,7 @@ class AerialRoadsModel(NNModel):
         self.datas = { "train_generator": train_generator, "val_generator": val_generator, "test_generator": test_generator }
 
         # Inputs
-        inputs  = Input(self.input_shape)
+        inputs = Input(self.input_shape)
         # ----- First Convolution - Max Pooling -----
         # 3x3 Convolution
         conv1  = Conv2D(16, (3, 3), padding='same', data_format='channels_last', name='conv1_1')(inputs)

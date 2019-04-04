@@ -32,6 +32,14 @@ class AnimalsModel(NNModel):
 
         # Input data shape
         self.input_shape = (150, 150, 3)
+        # File extensions for data to predict
+        self.FILE_EXTENSIONS = [
+            "png",
+            "jpg",
+            "jpeg",
+            "tif",
+            "tiff"
+        ]
 
     def createLayers(self):
         """
