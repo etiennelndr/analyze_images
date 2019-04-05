@@ -1,7 +1,7 @@
 Analyze images
 ==============
 
-**Segmentation** and **classification** of different types of images
+**Segmentation** and **classification** of different types of images.
 
 Classifications
 ---------------
