@@ -28,3 +28,26 @@ Before using this repository you must install these programs and libraries:
 - [scikit-image](https://scikit-image.org/) >= 0.14.2
 - [scikit-learn](https://scikit-learn.org/) >= 0.20.2
 - [tensorflow](https://www.tensorflow.org/) >= 1.10 (or tensorflow-gpu >= 1.10)
+
+Results
+-------
+
+### Digits classification
+
+TODO
+
+### Dogs and cats classification
+
+TODO
+
+### Roads segmentation
+
+TODO
+
+### Aerial roads segmentation
+
+TODO
+
+### Aerial buildings segmentation
+
+TODO
