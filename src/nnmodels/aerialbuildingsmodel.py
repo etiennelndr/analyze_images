@@ -34,7 +34,7 @@ class AerialBuildingsModel(NNModel):
     Neural network model for buildings segmentation in aerial images.
 
     Sources:
-        - buildings dataset -> https://project.inria.fr/aerialimagelabeling/    # Implemented
+        - buildings dataset -> https://project.inria.fr/aerialimagelabeling/
     """
 
     def __init__(self):

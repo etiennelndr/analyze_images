@@ -34,7 +34,7 @@ class AerialRoadsModel(NNModel):
     Neural network model for roads segmentation in aerial images.
 
     Sources:
-        - roads dataset     -> https://www.cs.toronto.edu/~vmnih/data/          # Not implemented
+        - roads dataset     -> https://www.cs.toronto.edu/~vmnih/data/
     """
 
     def __init__(self):
