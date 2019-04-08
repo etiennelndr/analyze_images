@@ -5,14 +5,14 @@ Analyze images
 
 Classifications
 ---------------
-  - Digits classification using [MNIST dataset](http://yann.lecun.com/exdb/mnist/)
-  - Dogs and cats classification using [this dataset](https://www.kaggle.com/c/dogs-vs-cats)
+  - [Digits classification](#digits-classification) using [MNIST dataset](http://yann.lecun.com/exdb/mnist/)
+  - [Dogs and cats classification](#dogs-and-cats-classification) using [this dataset](https://www.kaggle.com/c/dogs-vs-cats)
 
 Segmentations
 -------------
-  - Roads segmentation using [KITTI dataset](http://www.cvlibs.net/datasets/kitti/eval_road.php)
-  - Aerial roads segmentation using [this dataset](https://www.cs.toronto.edu/~vmnih/data/)
-  - Aerial buildings segmentation using [INRIA aerial images dataset](https://project.inria.fr/aerialimagelabeling/)
+  - [Roads segmentation](#roads-segmentation) using [KITTI dataset](http://www.cvlibs.net/datasets/kitti/eval_road.php)
+  - [Aerial roads segmentation](#aerial-roads-segmentation) using [this dataset](https://www.cs.toronto.edu/~vmnih/data/)
+  - [Aerial buildings segmentation](#aerial-builings-segmentation) using [INRIA aerial images dataset](https://project.inria.fr/aerialimagelabeling/)
 
 Requirements
 ------------
