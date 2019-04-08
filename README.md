@@ -12,7 +12,7 @@ Segmentations
 -------------
   - Roads segmentation using [KITTI dataset](http://www.cvlibs.net/datasets/kitti/eval_road.php)
   - Aerial roads segmentation using [this dataset](https://www.cs.toronto.edu/~vmnih/data/)
-  - Aerial buildings segmentation using [this dataset](https://project.inria.fr/aerialimagelabeling/)
+  - Aerial buildings segmentation using [INRIA aerial images dataset](https://project.inria.fr/aerialimagelabeling/)
 
 Requirements
 ------------
