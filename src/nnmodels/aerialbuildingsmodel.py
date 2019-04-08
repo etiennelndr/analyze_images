@@ -421,9 +421,9 @@ class AerialBuildingsModel(NNModel):
         # Create a new Image instance with the new_img_array array
         new_img = Image.fromarray(img_array.astype('uint8'))
         # Finally, save this image
-        new_img.save("segmented_img.jpg")
+        new_img.save(splitext(self.__filename)[0] + "_segmented_img.jpg")
         # Save the unsegmented image
-        imsave("unsegmented_img.jpg", np.array(Image.open(self.__filename)))
+        imsave(splitext(self.__filename)[0] + "_unsegmented_img.jpg", np.array(Image.open(self.__filename)))
 
         # Hold on, close the pointers before leaving
         new_img.close()
