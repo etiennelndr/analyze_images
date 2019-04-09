@@ -123,3 +123,10 @@ src/.vs
 *.json
 
 tests/**
+
+!/examples/aerial_buildings/bellingham2_segmented_img.jpg
+!/examples/aerial_buildings/bellingham2_unsegmented_img.jpg
+!/examples/aerial_roads/18328735_15_22_segmented_img.jpg
+!/examples/aerial_roads/18328735_15_22_unsegmented_img.jpg
+!/examples/roads/um_000014_segmented_img.jpg
+!/examples/roads/um_000014_unsegmented_img.jpg
