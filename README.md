@@ -47,12 +47,30 @@ TODO
 
 ### Roads segmentation
 
-TODO
+Before segmentation:
+
+![Before segmentation](examples/roads/um_000014_unsegmented_img.jpg)
+
+After segmentation:
+
+![After segmentation](examples/roads/um_000014_segmented_img.jpg)
 
 ### Aerial roads segmentation
 
-TODO
+Before segmentation:
+
+![Before segmentation](examples/aerial_roads/18328735_15_22_unsegmented_img.jpg)
+
+After segmentation:
+
+![After segmentation](examples/aerial_roads/18328735_15_22_segmented_img.jpg)
 
 ### Aerial buildings segmentation
 
-TODO
+Before segmentation:
+
+![Before segmentation](examples/aerial_buildings/bellingham2_unsegmented_img.jpg)
+
+After segmentation:
+
+![After segmentation](examples/aerial_buildings/bellingham2_segmented_img.jpg)
