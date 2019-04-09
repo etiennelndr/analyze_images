@@ -15,7 +15,7 @@ try:
     from keras.metrics import categorical_accuracy, sparse_categorical_accuracy, binary_accuracy
 
     from os import listdir
-    from os.path import isfile, exists, join, realpath, splitext
+    from os.path import isfile, exists, join, realpath, splitext, basename
     from os.path import split as pathsplit
     from random import randint
 
@@ -404,9 +404,9 @@ class AerialRoadsModel(NNModel):
         # Create a new Image instance with the new_img_array array
         new_img = Image.fromarray(img_array.astype('uint8'))
         # Finally, save this image
-        new_img.save(splitext(self.__filename)[0] + "_segmented_img.jpg")
+        new_img.save(basename(splitext(self.__filename)[0]) + "_segmented_img.jpg")
         # Save the unsegmented image
-        imsave(splitext(self.__filename)[0] + "_unsegmented_img.jpg", np.array(Image.open(self.__filename)))
+        imsave(basename(splitext(self.__filename)[0]) + "_unsegmented_img.jpg", np.array(Image.open(self.__filename)))
 
         # Hold on, close the pointers before leaving
         new_img.close()
