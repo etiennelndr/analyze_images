@@ -29,6 +29,11 @@ Before using this repository you must install these programs and libraries:
 - [scikit-learn](https://scikit-learn.org/) >= 0.20.2
 - [tensorflow](https://www.tensorflow.org/) >= 1.10 (or tensorflow-gpu >= 1.10)
 
+You can download these libraries with the following line:
+```
+pip install -r requirements.txt
+```
+
 Results
 -------
 
