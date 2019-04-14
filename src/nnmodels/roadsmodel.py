@@ -21,6 +21,8 @@ try:
 
     import tensorflow as tf
 
+    import glob
+
     import matplotlib.pyplot as plt
 
     import numpy as np
@@ -76,8 +78,9 @@ class RoadsModel(NNModel):
             assert exists(x_dir) == True
             assert exists(y_dir) == True
 
-            x_files = [join(x_dir, n) for n in listdir(x_dir) if isfile(join(x_dir, n))]
-            y_files = [join(y_dir, n) for n in listdir(y_dir) if isfile(join(y_dir, n))]
+            # FIX: glob.glob is waaaaay faster than [f for f in listdir() if isfile(f)]
+            x_files = glob.glob(join(x_dir, "*.jpg")) + glob.glob(join(x_dir, "*.png"))
+            y_files = glob.glob(join(y_dir, "*.jpg")) + glob.glob(join(y_dir, "*.png"))
 
             assert len(x_files) ==  len(y_files)
 

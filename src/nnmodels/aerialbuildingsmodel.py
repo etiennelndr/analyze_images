@@ -21,6 +21,8 @@ try:
 
     import tensorflow as tf
 
+    import glob
+
     import matplotlib.pyplot as plt
 
     import numpy as np
@@ -76,16 +78,21 @@ class AerialBuildingsModel(NNModel):
             assert exists(x_dir) == True
             assert exists(y_dir) == True
 
-            x_files = [join(x_dir, n) for n in listdir(x_dir) if isfile(join(x_dir, n))]
-            y_files = [join(y_dir, n) for n in listdir(y_dir) if isfile(join(y_dir, n))]
+            # FIX: glob.glob is waaaaay faster than [f for f in listdir() if isfile(f)]
+            x_files = glob.glob(join(x_dir, "*.tif")) + glob.glob(join(x_dir, "*.tiff"))
+            y_files = glob.glob(join(y_dir, "*.tif")) + glob.glob(join(y_dir, "*.tiff"))
             
             assert len(x_files) == len(y_files)
             
+            # Number of files
+            nbr_files = len(x_files)
+            # Let's begin the training/validation with the first file
+            index = 0
             while True:
                 x, y = list(), list()
-                for _ in range(batch_size):
-                    # Get a random index between 0 and len(x_files)
-                    index = randint(0, len(x_files)-1)
+                for i in range(batch_size):
+                    # Get a new index
+                    index = (index + 1)%nbr_files
 
                     # MUST be true (files must have the same name)
                     assert pathsplit(x_files[index])[-1] == pathsplit(y_files[index])[-1]
@@ -117,26 +124,6 @@ class AerialBuildingsModel(NNModel):
         # Create a generator for each step
         train_generator = createGenerator(train_dir, 4)
         val_generator   = createGenerator(val_dir,   4)
-
-        #x, y = next(train_generator)
-
-        #temp_y_img = np.zeros(self.input_shape)
-        #print(temp_y_img.shape)
-        #y = y.reshape(y.shape[1:])
-        #temp_y_img[y[:,:,0] == 0] = [0,0,0]
-        #temp_y_img[y[:,:,0] == 1] = [255,255,255]
-        #y = temp_y_img
-
-        #x = x.reshape(self.input_shape)
-        #print(x.shape)
-        #fig = plt.figure()
-        #fig.add_subplot(2,1,1)
-        #plt.imshow(x)
-        #fig.add_subplot(2,1,2)
-        #plt.imshow(y)
-        #plt.show()
-
-        #return
 
         # Datas
         self.datas = { "train_generator": train_generator, "val_generator": val_generator }
@@ -333,15 +320,15 @@ class AerialBuildingsModel(NNModel):
             # Fit including validation datas
             self._history = self._model.fit_generator(
                 self.datas["train_generator"],
-                steps_per_epoch = 1000,
+                steps_per_epoch = 3150,
                 epochs = epochs,
                 validation_data = self.datas["val_generator"],
-                validation_steps = 200)
+                validation_steps = 1350)
         elif "train_generator" in self.datas:
             # Fit without validation datas
             self._history = self._model.fit_generator(
                 self.datas["train_generator"],
-                steps_per_epoch = 1000,
+                steps_per_epoch = 3150,
                 epochs = epochs)
         else:
             raise NotImplementedError("Unknown data")
