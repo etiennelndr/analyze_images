@@ -394,17 +394,20 @@ class MainWindow(QMainWindow):
 
             # Plot datas
             # Accuracy
-            ax1.plot(x_acc)
-            ax1.plot(x_val_acc)
+            trainLegend, = ax1.plot(x_acc, label="training accuracy")
+            valLegend,   = ax1.plot(x_val_acc, label="validation accuracy")
             ax1.set_xlabel("epoch")
             ax1.set_ylabel("accuracy")
             ax1.set_title("Training and validation accuracy")
             # Loss
-            ax2.plot(x_loss)
-            ax2.plot(x_val_loss)
+            ax2.plot(x_loss, label="training loss")
+            ax2.plot(x_val_loss, label="validation loss")
             ax2.set_xlabel("epoch")
             ax2.set_ylabel("loss")
             ax2.set_title("Training and validation loss")
+
+            # Legend
+            self.__figure.legend(handles=(trainLegend, valLegend), labels=('training','validation'), loc='best')
 
             # Create a new directory if it doesn't exist
             dir = "models/figures"
