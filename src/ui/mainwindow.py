@@ -27,7 +27,6 @@ try:
 
     # In our case we're using the GPU which is faster than the CPU
     GPU, CPU = True, False
-    num_cores = 8
 
     if GPU:
         num_GPU = 1
@@ -36,8 +35,8 @@ try:
         num_CPU = 1
         num_GPU = 0
     # Create a new Tensorflow configuration
-    config = tf.ConfigProto(intra_op_parallelism_threads=num_cores,
-                            inter_op_parallelism_threads=num_cores, 
+    config = tf.ConfigProto(intra_op_parallelism_threads=0,
+                            inter_op_parallelism_threads=0, 
                             allow_soft_placement=True,
                             device_count = {'CPU' : num_CPU,
                                             'GPU' : num_GPU},
