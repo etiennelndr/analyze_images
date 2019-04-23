@@ -290,7 +290,7 @@ class AerialBuildingsModel(NNModel):
         conv10 = Conv2D(self.__nClasses, (1, 1), padding='same', data_format='channels_last', name='conv10_2')(acti10)
         print("conv10:", conv10.shape)
         bnor10 = BatchNormalization(name='bnor10_2', momentum=0.9)(conv10)
-        acti10 = Activation(tf.nn.softmax, name='acti10_2')(bnor10)
+        acti10 = Activation(tf.nn.sigmoid, name='acti10_2')(bnor10)
 
         # Set a new model with the inputs and the outputs (tenth convolution)
         self.setModel(Model(inputs=inputs, outputs=acti10))
@@ -311,7 +311,7 @@ class AerialBuildingsModel(NNModel):
         learning_rate = 1e-3
         # Compiling the model with an optimizer and a loss function
         self._model.compile(optimizer=Adam(lr=learning_rate, decay=learning_rate/epochs),
-                        loss=categorical_crossentropy,
+                        loss=binary_crossentropy,
                         metrics=["accuracy"])
 
         # Fitting the model by using our train and validation data
