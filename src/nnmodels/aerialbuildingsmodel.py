@@ -103,7 +103,7 @@ class AerialBuildingsModel(NNModel):
                     # Resize each image
                     x_img, y_img = imresize(x_img, self.input_shape[:2]), imresize(y_img, self.input_shape[:2])
                     # Apply a transformation on these images
-                    x_img, y_img = transfromXY(x_img, y_img)
+                    #x_img, y_img = transfromXY(x_img, y_img)
 
                     # Change y shape : (m, n, 3) -> (m, n, 2) (2 is the class number)
                     temp_y_img = np.zeros(self.input_shape[:2] + (1,))
@@ -195,22 +195,32 @@ class AerialBuildingsModel(NNModel):
         pool4  = MaxPooling2D(pool_size=(2, 2), name='pool4_1')(acti4)
 
         # ----- Fifth Convolution -----
-        # 3x3 Convolution
-        conv5  = Conv2D(256, (3, 3), padding='same', data_format='channels_last', name='conv5_1')(pool4)
-        print("conv5:", conv5.shape)
-        bnor5  = BatchNormalization(name='bnor5_1', momentum=0.9)(conv5)
-        acti5  = Activation(tf.nn.relu, name='acti5_1')(bnor5)
-        # Dropout of 0.25
-        drop5  = Dropout(0.25, name='drop5_1')(acti5)
-        # 3x3 Convolution
-        conv5  = Conv2D(256, (3, 3), padding='same', data_format='channels_last', name='conv5_2')(drop5)
-        print("conv5:", conv5.shape)
-        bnor5  = BatchNormalization(name='bnor5_2', momentum=0.9)(conv5)
-        acti5  = Activation(tf.nn.relu, name='acti5_2')(bnor5)
+        # 3x3 Convolution - No dilation
+        conv5_d1 = Conv2D(256, (3, 3), dilation_rate=1, padding='same', data_format='channels_last', name='conv5_d1')(pool4)
+        print("conv5_d1:", conv5_d1.shape)
+        bnor5_d1 = BatchNormalization(name='bnor5_d1', momentum=0.9)(conv5_d1)
+        acti5_d1 = Activation(tf.nn.relu, name='acti5_d1')(bnor5_d1)
+        # 3x3 Convolution - 2x2 dilation
+        conv5_d2 = Conv2D(256, (3, 3), dilation_rate=2, padding='same', data_format='channels_last', name='conv5_d2')(pool4)
+        print("conv5_d2:", conv5_d2.shape)
+        bnor5_d2 = BatchNormalization(name='bnor5_d2', momentum=0.9)(conv5_d2)
+        acti5_d2 = Activation(tf.nn.relu, name='acti5_d2')(bnor5_d2)
+        # 3x3 Convolution - 4x4 dilation
+        conv5_d4 = Conv2D(256, (3, 3), dilation_rate=4, padding='same', data_format='channels_last', name='conv5_d4')(pool4)
+        print("conv5_d4:", conv5_d4.shape)
+        bnor5_d4 = BatchNormalization(name='bnor5_d4', momentum=0.9)(conv5_d4)
+        acti5_d4 = Activation(tf.nn.relu, name='acti5_d4')(bnor5_d4)
+        # 3x3 Convolution - 8x8 dilation
+        conv5_d8 = Conv2D(256, (3, 3), dilation_rate=8, padding='same', data_format='channels_last', name='conv5_d8')(pool4)
+        print("conv5_d8:", conv5_d8.shape)
+        bnor5_d8 = BatchNormalization(name='bnor5_d8', momentum=0.9)(conv5_d8)
+        acti5_d8 = Activation(tf.nn.relu, name='acti5_d8')(bnor5_d8)
+
+        conc5_d  = Concatenate(axis=3, name='conc5_d')([acti5_d1, acti5_d2, acti5_d4, acti5_d8])
 
         # ----- Sixth Convolution -----
         # 2x2 Up Sampling
-        upsp6  = UpSampling2D(size = (2,2), name='upsp6_1')(acti5)
+        upsp6  = UpSampling2D(size = (2,2), name='upsp6_1')(conc5_d)
         # Concatenation
         conc6  = Concatenate(axis=3, name='conc6_1')([upsp6, acti4])
         # 3x3 Convolution
@@ -308,7 +318,7 @@ class AerialBuildingsModel(NNModel):
         # Number of epochs
         epochs = 10
         # Learning rate
-        learning_rate = 1e-3
+        learning_rate = 1e-4
         # Compiling the model with an optimizer and a loss function
         self._model.compile(optimizer=Adam(lr=learning_rate, decay=learning_rate/epochs),
                         loss=binary_crossentropy,
