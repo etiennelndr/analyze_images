@@ -44,7 +44,7 @@ def _randomRotationXY(x, y, rot=10):
     """
     Does a random rotation to x and y.
     """
-    # Pick a random degree of rotation between 25% on the left and 25% on the right
+    # Pick a random degree of rotation between rot% on the left and rot% on the right
     rand_deg = uniform(-rot, rot)
     # IMPORTANT: set parameter "preserve_range" to True to have values in [0;255] instead of [0;1].
     x, y = rotate(x, rand_deg, preserve_range=True), rotate(y, rand_deg, preserve_range=True)

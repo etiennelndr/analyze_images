@@ -338,7 +338,7 @@ class MainWindow(QMainWindow):
         #self.__ui.stopModelCreationBtn.setEnabled(False)
 
         if ret:
-            self.savedModelFilename = self.__data_to_process + datetime.now().strftime("_%H-%M-%S_%d-%m-%y")
+            self.savedModelFilename = self.__data_to_process + datetime.now().strftime("_%d-%m-%y_%H-%M-%S")
             # Save the model with the given name
             self.__model.saveModel(self.savedModelFilename)
             print("Model saved.")
