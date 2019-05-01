@@ -198,25 +198,38 @@ class AerialBuildingsModel(NNModel):
         # 3x3 Convolution - No dilation
         conv5_d1 = Conv2D(256, (3, 3), dilation_rate=1, padding='same', data_format='channels_last', name='conv5_d1')(pool4)
         print("conv5_d1:", conv5_d1.shape)
-        bnor5_d1 = BatchNormalization(name='bnor5_d1', momentum=0.9)(conv5_d1)
+        bnor5_d1 = BatchNormalization(name='bnor5_d1', momentum=0.825)(conv5_d1)
         acti5_d1 = Activation(tf.nn.relu, name='acti5_d1')(bnor5_d1)
+        # Dropout of 0.1
+        drop5_d1  = Dropout(0.1, name='drop5_d1')(acti5_d1)
         # 3x3 Convolution - 2x2 dilation
         conv5_d2 = Conv2D(256, (3, 3), dilation_rate=2, padding='same', data_format='channels_last', name='conv5_d2')(pool4)
         print("conv5_d2:", conv5_d2.shape)
-        bnor5_d2 = BatchNormalization(name='bnor5_d2', momentum=0.9)(conv5_d2)
+        bnor5_d2 = BatchNormalization(name='bnor5_d2', momentum=0.825)(conv5_d2)
         acti5_d2 = Activation(tf.nn.relu, name='acti5_d2')(bnor5_d2)
+        # Dropout of 0.1
+        drop5_d2  = Dropout(0.1, name='drop5_d2')(acti5_d2)
         # 3x3 Convolution - 4x4 dilation
         conv5_d4 = Conv2D(256, (3, 3), dilation_rate=4, padding='same', data_format='channels_last', name='conv5_d4')(pool4)
         print("conv5_d4:", conv5_d4.shape)
-        bnor5_d4 = BatchNormalization(name='bnor5_d4', momentum=0.9)(conv5_d4)
+        bnor5_d4 = BatchNormalization(name='bnor5_d4', momentum=0.825)(conv5_d4)
         acti5_d4 = Activation(tf.nn.relu, name='acti5_d4')(bnor5_d4)
+        # Dropout of 0.1
+        drop5_d4  = Dropout(0.1, name='drop5_d4')(acti5_d4)
         # 3x3 Convolution - 8x8 dilation
         conv5_d8 = Conv2D(256, (3, 3), dilation_rate=8, padding='same', data_format='channels_last', name='conv5_d8')(pool4)
-        print("conv5_d8:", conv5_d8.shape)
-        bnor5_d8 = BatchNormalization(name='bnor5_d8', momentum=0.9)(conv5_d8)
+        print("conv5_d8:", conv5_d8.conv5_d8)
+        bnor5_d8 = BatchNormalization(name='bnor5_d8', momentum=0.825)(conv5_d8)
         acti5_d8 = Activation(tf.nn.relu, name='acti5_d8')(bnor5_d8)
-
-        conc5_d  = Concatenate(axis=3, name='conc5_d')([acti5_d1, acti5_d2, acti5_d4, acti5_d8])
+        # Dropout of 0.1
+        drop5_d8  = Dropout(0.1, name='drop5_d8')(acti5_d8)
+        # Concatenate all of the dilated convolutions
+        conc5_d  = Concatenate(axis=3, name='conc5_d')([drop5_d1, drop5_d2, drop5_d4, drop5_d8])
+        # 3x3 Convolution
+        conv5  = Conv2D(256, (3, 3), padding='same', data_format='channels_last', name='conv5_1')(conc5_d)
+        print("conv5:", conv5.shape)
+        bnor5  = BatchNormalization(name='bnor5_1', momentum=0.825)(conv6)
+        acti5 = Activation(tf.nn.relu, name='acti5_1')(bnor6)
 
         # ----- Sixth Convolution -----
         # 2x2 Up Sampling
