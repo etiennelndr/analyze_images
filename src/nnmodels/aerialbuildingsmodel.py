@@ -218,7 +218,7 @@ class AerialBuildingsModel(NNModel):
         drop5_d4  = Dropout(0.1, name='drop5_d4')(acti5_d4)
         # 3x3 Convolution - 8x8 dilation
         conv5_d8 = Conv2D(256, (3, 3), dilation_rate=8, padding='same', data_format='channels_last', name='conv5_d8')(pool4)
-        print("conv5_d8:", conv5_d8.conv5_d8)
+        print("conv5_d8:", conv5_d8.shape)
         bnor5_d8 = BatchNormalization(name='bnor5_d8', momentum=0.825)(conv5_d8)
         acti5_d8 = Activation(tf.nn.relu, name='acti5_d8')(bnor5_d8)
         # Dropout of 0.1
@@ -228,8 +228,8 @@ class AerialBuildingsModel(NNModel):
         # 3x3 Convolution
         conv5  = Conv2D(256, (3, 3), padding='same', data_format='channels_last', name='conv5_1')(conc5_d)
         print("conv5:", conv5.shape)
-        bnor5  = BatchNormalization(name='bnor5_1', momentum=0.825)(conv6)
-        acti5 = Activation(tf.nn.relu, name='acti5_1')(bnor6)
+        bnor5  = BatchNormalization(name='bnor5_1', momentum=0.825)(conv5)
+        acti5 = Activation(tf.nn.relu, name='acti5_1')(bnor5)
 
         # ----- Sixth Convolution -----
         # 2x2 Up Sampling
@@ -333,7 +333,7 @@ class AerialBuildingsModel(NNModel):
         # Learning rate
         learning_rate = 1e-4
         # Compiling the model with an optimizer and a loss function
-        self._model.compile(optimizer=Adam(lr=learning_rate, decay=learning_rate/epochs),
+        self._model.compile(optimizer=RMSprop(lr=learning_rate, decay=learning_rate/epochs),
                         loss=binary_crossentropy,
                         metrics=["accuracy"])
 
