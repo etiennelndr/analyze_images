@@ -128,17 +128,17 @@ class NNModel(object):
         """
         raise NotImplementedError("Please implement this method.")
 
-    def loadDataToPredict(self, filename):
+    def predictOutput(self):
         """
-        Loads data to predict.
+        Predicts an output for a given list of files/datas.
         """
         raise NotImplementedError("Please implement this method.")
 
-    def predictValue(self):
+    def loadFilesToPredict(self, files):
         """
-        Predicts a value with a given data.
+        Loads files to predict.
         """
-        raise NotImplementedError("Please implement this method.")
+        self.filenames = files
 
     def saveModel(self, basename="basename", dir="models"):
         """

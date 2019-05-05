@@ -27,7 +27,7 @@ try:
 
     import numpy as np
 
-    from image import transfromXY
+    from preprocessing.image import transfromXY
 except ImportError as err:
     exit(err)
 
@@ -43,7 +43,7 @@ class AerialBuildingsModel(NNModel):
         """
         Initialization of the model.
         """
-        NNModel.__init__(self, "model", "aerial_buildings")
+        super().__init__("model", "aerial_buildings")
 
         # Number of classes to segment
         # 0 -> not a building
@@ -233,7 +233,7 @@ class AerialBuildingsModel(NNModel):
 
         # ----- Sixth Convolution -----
         # 2x2 Up Sampling
-        upsp6  = UpSampling2D(size = (2,2), name='upsp6_1')(conc5_d)
+        upsp6  = UpSampling2D(size = (2,2), name='upsp6_1')(acti5)
         # Concatenation
         conc6  = Concatenate(axis=3, name='conc6_1')([upsp6, acti4])
         # 3x3 Convolution
@@ -364,78 +364,62 @@ class AerialBuildingsModel(NNModel):
         # Training is over
         self._training = False
 
-    def loadDataToPredict(self, filename):
+    def predictOutput(self):
         """
-        Loads data to predict.
+        Predicts an output for a given list of files/data.
         """
-        # Store the file name
-        self.__filename = filename
+        for filename in self.filenames:
+            print(filename)
+            # Open the desired picture
+            im = Image.open(filename)
+            # Get the image array
+            img_to_predict = np.array(im)
+            # Be careful -> each pixel value must be a float
+            img_to_predict = img_to_predict.astype('float32')
+            # Close the file pointer (if possible)
+            im.close()
+            # Store the real shape for later
+            real_shape = img_to_predict.shape
 
-        # Open the desired picture
-        im = Image.open(filename)
+            # At this time we can only use images of shape (m*500, n*500, 3)
+            assert real_shape[0]%500 == 0
+            assert real_shape[1]%500 == 0
 
-        # Get the image array
-        self.__imgToPredict = np.array(im)
-        # Be careful -> each pixel value must be a float
-        self.__imgToPredict = self.__imgToPredict.astype('float32')
-        # Make a copy of this array to show the picture
-        img = np.copy(self.__imgToPredict)
-        # Normalize the image
-        self.__imgToPredict /= 255
-        # Close the file pointer (if possible)
-        im.close()
-
-    def predictValue(self):
-        """
-        Predicts a value with a given data.
-        """
-        # Get the array of the real image
-        img_array = np.array(Image.open(self.__filename))
-        # Store the real shape for later
-        real_shape = img_array.shape
-
-        # At this time we can only use images of shape (m*500, n*500, 3)
-        assert real_shape[0]%500 == 0
-        assert real_shape[1]%500 == 0
-
-        # Predict the segmentation for this picture (its array is stored in data)
-        pred = np.zeros(real_shape[:2] + (1,))
-        for i in range(int(real_shape[0]/500)):
-            for j in range(int(real_shape[1]/500)):
-                print(i,j)
-                # Get a sub-array of the main array
-                sub_array  = self.__imgToPredict[i*500:(i+1)*500:, j*500:(j+1)*500:, :]
-                sub_img = array_to_img(sub_array).resize(self.input_shape[:2])
-                # Because array_to_img is modifying array values to [0,255] we have 
-                # to divide each value by 255
-                sub_array = np.array(sub_img)/255.
+            # Predict the segmentation for this picture (its array is stored in data)
+            pred = np.zeros(real_shape[:2] + (1,))
+            for i in range(int(real_shape[0]/500)):
+                for j in range(int(real_shape[1]/500)):
+                    print(i,j)
+                    # Get a sub-array of the main array
+                    sub_array = img_to_predict[i*500:(i+1)*500:, j*500:(j+1)*500:, :]
+                    sub_img = array_to_img(sub_array).resize(self.input_shape[:2])
+                    # Because array_to_img is modifying array values to [0,255] we have 
+                    # to divide each value by 255
+                    sub_array = np.array(sub_img)/255.
                 
-                # Predict the segmentation for this sub-array
-                pred_array = self._model.predict(sub_array.reshape((1,) + sub_array.shape))
-                pred_img = array_to_img(pred_array.reshape(pred_array.shape[1:])).resize((500,500))
-                pred_array = np.array(pred_img).reshape(500,500,1)
-                # Add this sub-array to the main array
-                pred[i*500:(i+1)*500:, j*500:(j+1)*500:, :] = pred_array/255.
+                    # Predict the segmentation for this sub-array
+                    pred_array = self._model.predict(sub_array.reshape((1,) + sub_array.shape))
+                    pred_img = array_to_img(pred_array.reshape(pred_array.shape[1:])).resize((500,500))
+                    pred_array = np.array(pred_img).reshape(500,500,1)
+                    # Add this sub-array to the main array
+                    pred[i*500:(i+1)*500:, j*500:(j+1)*500:, :] = pred_array/255.
 
-        # Reshape the image array to (m, n, 3)
-        reshaped_img_array = np.array(Image.fromarray(img_array).resize(real_shape[:2][::-1]))
-        # If the result for the second value is more than 0.9 -> store a 
-        # "green" array for this index
-        reshaped_img_array[pred[:,:,0] > 0.9] = [0, 240, 0]
-        # Because we need to put the segmented road on the real image, we have to
-        # reshape the predicted array to the real shape
-        reshaped_img_array = np.array(Image.fromarray(reshaped_img_array).resize(real_shape[:2][::-1]))
-        # Now, for each element in the picture, replace it or not
-        img_array[reshaped_img_array[:,:,1] == 240] = [0,240,0]
+            # Reshape the image array to (m, n, 3)
+            reshaped_img_array = np.array(Image.fromarray(img_array).resize(real_shape[:2][::-1]))
+            # If the result for the second value is more than 0.9 -> store a 
+            # "green" array for this index
+            reshaped_img_array[pred[:,:,0] > 0.9] = [0, 240, 0]
+            # Now, for each element in the picture, replace it or not
+            img_array[reshaped_img_array[:,:,1] == 240] = [0,240,0]
 
-        # Create a new Image instance with the new_img_array array
-        new_img = Image.fromarray(img_array.astype('uint8'))
-        # Finally, save this image
-        new_img.save(basename(splitext(self.__filename)[0]) + "_segmented_img.jpg")
-        # Save the unsegmented image
-        imsave(basename(splitext(self.__filename)[0]) + "_unsegmented_img.jpg", np.array(Image.open(self.__filename)))
+            # Create a new Image instance with the new_img_array array
+            new_img = Image.fromarray(img_array.astype('uint8'))
+            # Finally, save this image
+            new_img.save(basename(splitext(self.__filename)[0]) + "_segmented_img.jpg")
+            # Save the unsegmented image
+            imsave(basename(splitext(self.__filename)[0]) + "_unsegmented_img.jpg", np.array(Image.open(self.__filename)))
 
-        # Hold on, close the pointers before leaving
-        new_img.close()
+            # Hold on, close the pointers before leaving
+            new_img.close()
 
-        print("Done")
+            print("Done")

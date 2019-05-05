@@ -68,7 +68,7 @@ class ThreadCreateModel(QThread):
     threadDone = pyqtSignal(bool)
 
     def __init__(self, mw):
-        QThread.__init__(self)
+        super().__init__()
         # Main window instance
         self.__mw = mw
 
@@ -155,8 +155,8 @@ class MainWindow(QMainWindow):
                 self.__model = DigitsModel()
                 # Create a variable to prevent the use of an uninitialized model
                 self.__isModelLoaded = False
-                # Image to predict
-                self.__imgToPredict = None
+                # The data to predict
+                self.__data_to_predict = list()
 
     def __initUI(self):
         """
@@ -265,18 +265,26 @@ class MainWindow(QMainWindow):
     @pyqtSlot()
     def openFile(self):
         """
-        Opens an existing file.
+        Opens a list of files.
         """
         # Set options
         options = QFileDialog.Options() # No option
         # Get file path
-        filename, _ = QFileDialog.getOpenFileName(self, "Open File", "",self.__model.concatenateExtensions(), options=options)
-        if filename.endswith(tuple(self.__model.FILE_EXTENSIONS)):
-            self.__imgToPredict = filename
-            # Load in the model
-            self.__model.loadDataToPredict(filename)
-        else:
-            print("ERROR: wrong file extension.")
+        filenames, _ = QFileDialog.getOpenFileNames(self, "Open File", "", self.__model.concatenateExtensions(), options=options)
+        # Create an empty list
+        files = list()
+        for filename in filenames:
+            if filename.endswith(tuple(self.__model.FILE_EXTENSIONS)):
+                # Add this file in the files to process
+                files.append(filename)
+            else:
+                print("ERROR: wrong file extension.")
+
+        # Check the length of this list to not write a void list in
+        # the MainWindow.__data_to_predict list
+        if len(files) != 0:
+            # Copy these values in the MainWindow.__data_to_predict list
+            self.__data_to_predict = files
 
     @pyqtSlot()
     def openModel(self):
@@ -357,13 +365,11 @@ class MainWindow(QMainWindow):
         method you have to load an image with the method MainWindow.openFile().
         """
         if self.__isModelLoaded:
-            if self.__imgToPredict is not None:
-                # Predict the value
-                pred = self.__model.predictValue()
-                # Show the value
-                if self.__data_to_process in ["digits", "animals"]:
-                    # Show the predicted value in a QLabel
-                    self.__ui.predictedValue.setText(pred)
+            if len(self.__data_to_predict) != 0:
+                # Load these files in the model
+                self.__model.loadFilesToPredict(self.__data_to_predict)
+                # Predict the output
+                pred = self.__model.predictOutput()
             else:
                 print("ERROR: please, open an image to predict.")
         else:
