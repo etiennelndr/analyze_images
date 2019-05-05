@@ -27,7 +27,7 @@ try:
 
     import numpy as np
 
-    from image import transfromXY
+    from preprocessing.image import transfromXY
 except ImportError as err:
     exit(err)
 
@@ -43,7 +43,7 @@ class AerialRoadsModel(NNModel):
         """
         Initialization of the model.
         """
-        NNModel.__init__(self, "model", "aerial_roads")
+        super().__init__("model", "aerial_roads")
 
         # Number of classes to segment
         # 0 -> not a building

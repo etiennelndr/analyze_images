@@ -20,7 +20,7 @@ class KidneysModel(NNModel):
         """
         Initialization of the model.
         """
-        NNModel.__init__(self, 'model', 'kidneys')
+        super().__init__('model', 'kidneys')
 
         # Input data shape
         self.input_shape = (611, 512, 512) # 512 slices of 611x512 images

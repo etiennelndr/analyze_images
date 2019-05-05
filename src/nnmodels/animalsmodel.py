@@ -28,7 +28,7 @@ class AnimalsModel(NNModel):
         """
         Initialization of the model.
         """
-        NNModel.__init__(self, 'sequential', 'animals')
+        super().__init__('sequential', 'animals')
 
         # Input data shape
         self.input_shape = (150, 150, 3)

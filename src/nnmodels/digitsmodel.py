@@ -25,7 +25,7 @@ class DigitsModel(NNModel):
         """
         Initialization of the model.
         """
-        NNModel.__init__(self, 'sequential', 'digits')
+        super().__init__('sequential', 'digits')
 
         # Input data shape
         self.input_shape = (28, 28, 1)
