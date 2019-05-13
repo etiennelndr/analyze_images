@@ -130,3 +130,5 @@ tests/**
 !/examples/aerial_roads/18328735_15_22_unsegmented_img.jpg
 !/examples/roads/um_000014_segmented_img.jpg
 !/examples/roads/um_000014_unsegmented_img.jpg
+*.xml
+*.iml
