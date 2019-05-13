@@ -1,3 +1,5 @@
+from typing import Optional, Any
+
 try:
     from skimage.transform import rotate, resize
     from skimage.util import random_noise
@@ -10,6 +12,7 @@ try:
     from keras.preprocessing.image import array_to_img
 except ImportError as err:
     exit(err)
+
 
 def change_values_in_array(a, val_old, val_new):
     """
@@ -81,6 +84,7 @@ def transform_shape(shape):
 
     return new_shape
 
+
 def crop_and_resize(dir, result_dir, cropping_size=(1000, 1000), new_size=(336,336)):
     """
     Crop and resize a list of images. 
@@ -114,6 +118,7 @@ def crop_and_resize(dir, result_dir, cropping_size=(1000, 1000), new_size=(336,3
                 # Finally, save it as a new image
                 imwrite(join(result_dir, filename + "_{}{}".format(i,j) + ext), im_crop_resized)
 
+
 def transfromXY(x, y):
     """
     Applies random transformations on x and y.
@@ -126,13 +131,14 @@ def transfromXY(x, y):
     rotateOrNot = DATA_AUGMENTATION_FUNCTIONS[choice([functions[0], functions[2]])]
     x, y = rotateOrNot(x, y)
     # Add noise (or not) to the first image
-    #addNoiseOrNot = DATA_AUGMENTATION_FUNCTION[choice([functions[0], functions[3]])]
-    #x, y = addNoiseOrNot(x, y)
+    # addNoiseOrNot = DATA_AUGMENTATION_FUNCTION[choice([functions[0], functions[3]])]
+    # x, y = addNoiseOrNot(x, y)
     # Zoom (or not) on both images
     zoomOrNot = DATA_AUGMENTATION_FUNCTIONS[choice([functions[0], functions[4]])]
     x, y = zoomOrNot(x, y)
 
     return x, y
+
 
 def _returnXY(x, y):
     """
@@ -140,11 +146,13 @@ def _returnXY(x, y):
     """
     return x, y
 
+
 def _flipXY(x, y):
     """
     Flips x and y.
     """
     return np.fliplr(x), np.fliplr(y)
+
 
 def _rotationXY(x, y, rot=10, random_rot=True):
     """
@@ -160,6 +168,7 @@ def _rotationXY(x, y, rot=10, random_rot=True):
     x, y = rotate(x, rand_deg, preserve_range=True), rotate(y, rand_deg, preserve_range=True)
     return x, y
 
+
 def _randomNoiseXY(x, y):
     """
     Adds random noise to x but nothing to y.
@@ -171,6 +180,7 @@ def _randomNoiseXY(x, y):
         return x, y
     return nx.astype(dtype), y
 
+
 def _zoomXY(x, y, zoom=None):
     """
     Zooms on x and y. The same zoom is applied on both images.
@@ -178,11 +188,12 @@ def _zoomXY(x, y, zoom=None):
     """
     if zoom is None:
         zoom = randint(0, int(min(x.shape[:2] + y.shape[:2])/4))
-    x_zoomed = x[random_zoom:x.shape[0]-random_zoom, random_zoom:x.shape[1]-random_zoom, :]
-    y_zoomed = y[random_zoom:y.shape[0]-random_zoom, random_zoom:y.shape[1]-random_zoom, :]
+    x_zoomed = x[zoom:x.shape[0]-zoom, zoom:x.shape[1]-zoom, :]
+    y_zoomed = y[zoom:y.shape[0]-zoom, zoom:y.shape[1]-zoom, :]
     x = np.array(array_to_img(x_zoomed).resize(x.shape[:2][::-1]))
     y = np.array(array_to_img(y_zoomed).resize(y.shape[:2][::-1]))
     return x, y
+
 
 DATA_AUGMENTATION_FUNCTIONS = {
     # No transformation
@@ -211,8 +222,8 @@ if __name__ == "__main__":
     output_dir = join(dir_path, "tests")
 
     # Check if file and directory exist
-    assert exists(dir_path) == True
-    assert exists(file)     == True
+    assert exists(dir_path) is True
+    assert exists(file)     is True
 
     if not exists(output_dir):
         mkdir(output_dir)
@@ -230,7 +241,7 @@ if __name__ == "__main__":
     imsave(join(output_dir, "flip_y_" + filename), y_flip)
 
     # ROTATE
-    x_rot, y_rot = _randomRotationXY(x, y)
+    x_rot, y_rot = _rotationXY(x, y)
 
     imsave(join(output_dir, "rot_x_" + filename), x_rot)
     imsave(join(output_dir, "rot_y_" + filename), y_rot)
@@ -241,7 +252,7 @@ if __name__ == "__main__":
     imsave(join(output_dir, "noise_x_" + filename), x_noise)
 
     # ZOOM
-    x_zoom, y_zoom = _randomZoomXY(x, y)
+    x_zoom, y_zoom = _zoomXY(x, y)
 
     imsave(join(output_dir, "zoom_x_" + filename), x_zoom)
     imsave(join(output_dir, "zoom_y_" + filename), y_zoom)

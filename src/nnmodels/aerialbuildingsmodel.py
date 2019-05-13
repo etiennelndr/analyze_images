@@ -31,6 +31,7 @@ try:
 except ImportError as err:
     exit(err)
 
+
 class AerialBuildingsModel(NNModel):
     """
     Neural network model for buildings segmentation in aerial images.
@@ -68,15 +69,15 @@ class AerialBuildingsModel(NNModel):
         train_dir = join(base_dir, "training")
         val_dir   = join(base_dir, "validation")
 
-        assert exists(train_dir) == True
-        assert exists(val_dir)   == True
+        assert exists(train_dir) is True
+        assert exists(val_dir)   is True
 
-        def createGenerator(dir, batch_size=2):
-            x_dir = join(dir, "x")
-            y_dir = join(dir, "y")
+        def create_generator(folder, batch_size=2):
+            x_dir = join(folder, "x")
+            y_dir = join(folder, "y")
 
-            assert exists(x_dir) == True
-            assert exists(y_dir) == True
+            assert exists(x_dir) is True
+            assert exists(y_dir) is True
 
             # FIX: glob.glob is waaaaay faster than [f for f in listdir() if isfile(f)]
             x_files = glob.glob(join(x_dir, "*.tif")) + glob.glob(join(x_dir, "*.tiff"))
@@ -92,7 +93,7 @@ class AerialBuildingsModel(NNModel):
                 x, y = list(), list()
                 for i in range(batch_size):
                     # Get a new index
-                    index = (index + 1)%nbr_files
+                    index = (index + 1) % nbr_files
 
                     # MUST be true (files must have the same name)
                     assert pathsplit(x_files[index])[-1] == pathsplit(y_files[index])[-1]
@@ -107,8 +108,8 @@ class AerialBuildingsModel(NNModel):
 
                     # Change y shape : (m, n, 3) -> (m, n, 2) (2 is the class number)
                     temp_y_img = np.zeros(self.input_shape[:2] + (1,))
-                    temp_y_img[y_img[:,:,0] == 0]   = 0
-                    temp_y_img[y_img[:,:,0] == 255] = 1
+                    temp_y_img[y_img[:, :, 0] == 0]   = 0
+                    temp_y_img[y_img[:, :, 0] == 255] = 1
                     y_img = temp_y_img
 
                     # Convert to float
@@ -122,8 +123,8 @@ class AerialBuildingsModel(NNModel):
                 yield np.array(x), np.array(y)
 
         # Create a generator for each step
-        train_generator = createGenerator(train_dir, 6) # 12600 images
-        val_generator   = createGenerator(val_dir,   6) # 5400 images
+        train_generator = create_generator(train_dir, 6) # 12600 images
+        val_generator   = create_generator(val_dir,   6) # 5400 images
 
         # Datas
         self.datas = { "train_generator": train_generator, "val_generator": val_generator }
@@ -134,15 +135,13 @@ class AerialBuildingsModel(NNModel):
         # 3x3 Convolution
         conv1  = Conv2D(16, (3, 3), padding='same', data_format='channels_last', name='conv1_1')(inputs)
         print("conv1:", conv1.shape)
-        bnor1  = BatchNormalization(name='bnor1_1', momentum=0.825)(conv1)
-        acti1  = Activation(tf.nn.relu, name='acti1_1')(bnor1)
+        acti1  = Activation(tf.nn.relu, name='acti1_1')(conv1)
         # Dropout of 0.2
         drop1  = Dropout(0.2, name='drop1_1')(acti1)
         # 3x3 Convolution
         conv1  = Conv2D(16, (3, 3), padding='same', data_format='channels_last', name='conv1_2')(drop1)
         print("conv1:", conv1.shape)
-        bnor1  = BatchNormalization(name='bnor1_2', momentum=0.825)(conv1)
-        acti1  = Activation(tf.nn.relu, name='acti1_2')(bnor1)
+        acti1  = Activation(tf.nn.relu, name='acti1_2')(conv1)
         # 2x2 Max Pooling
         pool1  = MaxPooling2D(pool_size=(2, 2), name='pool1_1')(acti1)
 
@@ -150,15 +149,13 @@ class AerialBuildingsModel(NNModel):
         # 3x3 Convolution
         conv2  = Conv2D(32, (3, 3), padding='same', data_format='channels_last', name='conv2_1')(pool1)
         print("conv2:", conv2.shape)
-        bnor2  = BatchNormalization(name='bnor2_1', momentum=0.825)(conv2)
-        acti2  = Activation(tf.nn.relu, name='acti2_1')(bnor2)
+        acti2  = Activation(tf.nn.relu, name='acti2_1')(conv2)
         # Dropout of 0.2
         drop2  = Dropout(0.2, name='drop2_1')(acti2)
         # 3x3 Convolution
         conv2  = Conv2D(32, (3, 3), padding='same', data_format='channels_last', name='conv2_2')(drop2)
         print("conv2:", conv2.shape)
-        bnor2  = BatchNormalization(name='bnor2_2', momentum=0.825)(conv2)
-        acti2  = Activation(tf.nn.relu, name='acti2_2')(bnor2)
+        acti2  = Activation(tf.nn.relu, name='acti2_2')(conv2)
         # 2x2 Max Pooling
         pool2  = MaxPooling2D(pool_size=(2, 2), name='pool2_1')(acti2)
 
@@ -166,15 +163,13 @@ class AerialBuildingsModel(NNModel):
         # 3x3 Convolution
         conv3  = Conv2D(64, (3, 3), padding='same', data_format='channels_last', name='conv3_1')(pool2)
         print("conv3:", conv3.shape)
-        bnor3  = BatchNormalization(name='bnor3_1', momentum=0.825)(conv3)
-        acti3  = Activation(tf.nn.relu, name='acti3_1')(bnor3)
+        acti3  = Activation(tf.nn.relu, name='acti3_1')(conv3)
         # Dropout of 0.2
         drop3  = Dropout(0.2, name='drop3_2')(acti3)
         # 3x3 Convolution
         conv3  = Conv2D(64, (3, 3), padding='same', data_format='channels_last', name='conv3_2')(drop3)
         print("conv3:", conv3.shape)
-        bnor3  = BatchNormalization(name='bnor3_2', momentum=0.825)(conv3)
-        acti3  = Activation(tf.nn.relu, name='acti3_2')(bnor3)
+        acti3  = Activation(tf.nn.relu, name='acti3_2')(conv3)
         # 2x2 Max Pooling
         pool3  = MaxPooling2D(pool_size=(2, 2), name='pool3_1')(acti3)
 
@@ -182,15 +177,13 @@ class AerialBuildingsModel(NNModel):
         # 3x3 Convolution
         conv4  = Conv2D(128, (3, 3), padding='same', data_format='channels_last', name='conv4_1')(pool3)
         print("conv4:", conv4.shape)
-        bnor4  = BatchNormalization(name='bnor4_1', momentum=0.825)(conv4)
-        acti4  = Activation(tf.nn.relu, name='acti4_1')(bnor4)
+        acti4  = Activation(tf.nn.relu, name='acti4_1')(conv4)
         # Dropout of 0.2
         drop4  = Dropout(0.2, name='drop4_2')(acti4)
         # 3x3 Convolution
         conv4  = Conv2D(128, (3, 3), padding='same', data_format='channels_last', name='conv4_2')(drop4)
         print("conv4:", conv4.shape)
-        bnor4  = BatchNormalization(name='bnor4_2', momentum=0.825)(conv4)
-        acti4  = Activation(tf.nn.relu, name='acti4_2')(bnor4)
+        acti4  = Activation(tf.nn.relu, name='acti4_2')(conv4)
         # 2x2 Max Pooling
         pool4  = MaxPooling2D(pool_size=(2, 2), name='pool4_1')(acti4)
 
@@ -239,15 +232,13 @@ class AerialBuildingsModel(NNModel):
         # 3x3 Convolution
         conv6  = Conv2D(128, (3, 3), padding='same', data_format='channels_last', name='conv6_1')(conc6)
         print("conv6:", conv6.shape)
-        bnor6  = BatchNormalization(name='bnor6_1', momentum=0.825)(conv6)
-        acti6  = Activation(tf.nn.relu, name='acti6_1')(bnor6)
+        acti6  = Activation(tf.nn.relu, name='acti6_1')(conv6)
         # Dropout of 0.2
         drop6  = Dropout(0.2, name='drop6_2')(acti6)
         # 3x3 Convolution
         conv6  = Conv2D(128, (3, 3), padding='same', data_format='channels_last', name='conv6_2')(drop6)
         print("conv6:", conv6.shape)
-        bnor6  = BatchNormalization(name='bnor6_2', momentum=0.825)(conv6)
-        acti6  = Activation(tf.nn.relu, name='acti6_2')(bnor6)
+        acti6  = Activation(tf.nn.relu, name='acti6_2')(conv6)
 
         # ----- Seventh Convolution - Up Sampling -----
         # 2x2 Up Sampling
@@ -257,15 +248,13 @@ class AerialBuildingsModel(NNModel):
         # 3x3 Convolution
         conv7  = Conv2D(64, (3, 3), padding='same', data_format='channels_last', name='conv7_1')(conc7)
         print("conv7:", conv7.shape)
-        bnor7  = BatchNormalization(name='bnor7_1', momentum=0.825)(conv7)
-        acti7  = Activation(tf.nn.relu, name='acti7_1')(bnor7)
+        acti7  = Activation(tf.nn.relu, name='acti7_1')(conv7)
         # Dropout of 0.2
         drop7  = Dropout(0.2, name='drop7_2')(acti7)
         # 3x3 Convolution
         conv7  = Conv2D(64, (3, 3), padding='same', data_format='channels_last', name='conv7_2')(drop7)
         print("conv7:", conv7.shape)
-        bnor7  = BatchNormalization(name='bnor7_2', momentum=0.825)(conv7)
-        acti7  = Activation(tf.nn.relu, name='acti7_2')(bnor7)
+        acti7  = Activation(tf.nn.relu, name='acti7_2')(conv7)
 
         # ----- Eighth Convolution - Up Sampling -----
         # 2x2 Up Sampling
@@ -275,15 +264,13 @@ class AerialBuildingsModel(NNModel):
         # 3x3 Convolution
         conv8  = Conv2D(32, (3, 3), padding='same', data_format='channels_last', name='conv8_1')(conc8)
         print("conv8:", conv8.shape)
-        bnor8  = BatchNormalization(name='bnor8_1', momentum=0.825)(conv8)
-        acti8  = Activation(tf.nn.relu, name='acti8_1')(bnor8)
+        acti8  = Activation(tf.nn.relu, name='acti8_1')(conv8)
         # Dropout of 0.2
         drop8  = Dropout(0.2, name='drop8_1')(acti8)
         # 3x3 Convolution
         conv8  = Conv2D(32, (3, 3), padding='same', data_format='channels_last', name='conv8_2')(drop8)
         print("conv8:", conv8.shape)
-        bnor8  = BatchNormalization(name='bnor8_2', momentum=0.825)(conv8)
-        acti8  = Activation(tf.nn.relu, name='acti8_2')(bnor8)
+        acti8  = Activation(tf.nn.relu, name='acti8_2')(conv8)
 
         # ----- Ninth Convolution - Up Sampling -----
         # 2x2 Up Sampling
@@ -293,27 +280,23 @@ class AerialBuildingsModel(NNModel):
         # 3x3 Convolution
         conv9  = Conv2D(16, (3, 3), padding='same', data_format='channels_last', name='conv9_1')(conc9)
         print("conv9:", conv9.shape)
-        bnor9  = BatchNormalization(name='bnor9_1', momentum=0.825)(conv9)
-        acti9  = Activation(tf.nn.relu, name='acti9_1')(bnor9)
+        acti9  = Activation(tf.nn.relu, name='acti9_1')(conv9)
         # Dropout of 0.2
         drop9  = Dropout(0.2, name='drop9_1')(acti9)
-        ## 3x3 Convolution
+        # 3x3 Convolution
         conv9  = Conv2D(16, (3, 3), padding='same', data_format='channels_last', name='conv9_2')(drop9)
         print("conv9:", conv9.shape)
-        bnor9  = BatchNormalization(name='bnor9_2', momentum=0.825)(conv9)
-        acti9  = Activation(tf.nn.relu, name='acti9_2')(bnor9)
+        acti9  = Activation(tf.nn.relu, name='acti9_2')(conv9)
 
         # ----- Tenth Convolution (outputs) -----
         # 3x3 Convolution
         conv10 = Conv2D(2, (3, 3), padding='same', data_format='channels_last', name='conv10_1')(acti9)
         print("conv10:", conv10.shape)
-        bnor10 = BatchNormalization(name='bnor10_1', momentum=0.825)(conv10)
-        acti10 = Activation(tf.nn.sigmoid, name='acti10_1')(bnor10)
+        acti10 = Activation(tf.nn.sigmoid, name='acti10_1')(conv10)
         # 1x1 Convolution
         conv10 = Conv2D(self.__nClasses, (1, 1), padding='same', data_format='channels_last', name='conv10_2')(acti10)
         print("conv10:", conv10.shape)
-        bnor10 = BatchNormalization(name='bnor10_2', momentum=0.825)(conv10)
-        acti10 = Activation(tf.nn.sigmoid, name='acti10_2')(bnor10)
+        acti10 = Activation(tf.nn.sigmoid, name='acti10_2')(conv10)
 
         # Set a new model with the inputs and the outputs (tenth convolution)
         self.setModel(Model(inputs=inputs, outputs=acti10))
@@ -343,23 +326,23 @@ class AerialBuildingsModel(NNModel):
             # Fit including validation datas
             self._history = self._model.fit_generator(
                 self.datas["train_generator"],
-                steps_per_epoch = 5000,
+                steps_per_epoch=5000,
                 epochs = epochs,
-                validation_data = self.datas["val_generator"],
-                validation_steps = 1500)
+                validation_data=self.datas["val_generator"],
+                validation_steps=1500)
         elif "train_generator" in self.datas:
             # Fit without validation datas
             self._history = self._model.fit_generator(
                 self.datas["train_generator"],
-                steps_per_epoch = 5000,
-                epochs = epochs)
+                steps_per_epoch=5000,
+                epochs=epochs)
         else:
             raise NotImplementedError("Unknown data")
 
         if "test_generator" in self.datas:
             # Evaluation of the model
-            testLoss, acc_test = self._model.evaluate_generator(self.datas["test_generator"], steps=250, verbose=1)
-            print("Loss / test: " + str(testLoss) + " and accuracy: " + str(acc_test))
+            test_loss, acc_test = self._model.evaluate_generator(self.datas["test_generator"], steps=250, verbose=1)
+            print("Loss / test: " + str(test_loss) + " and accuracy: " + str(acc_test))
 
         # Training is over
         self._training = False
@@ -382,8 +365,8 @@ class AerialBuildingsModel(NNModel):
             real_shape = img_to_predict.shape
 
             # At this time we can only use images of shape (m*500, n*500, 3)
-            assert real_shape[0]%500 == 0
-            assert real_shape[1]%500 == 0
+            assert real_shape[0] % 500 == 0
+            assert real_shape[1] % 500 == 0
 
             # Predict the segmentation for this picture (its array is stored in data)
             pred = np.zeros(real_shape[:2] + (1,))
@@ -405,15 +388,15 @@ class AerialBuildingsModel(NNModel):
                     pred[i*500:(i+1)*500:, j*500:(j+1)*500:, :] = pred_array/255.
 
             # Reshape the image array to (m, n, 3)
-            reshaped_img_array = np.array(Image.fromarray(img_array).resize(real_shape[:2][::-1]))
+            reshaped_img_array = np.array(Image.fromarray(img_to_predict).resize(real_shape[:2][::-1]))
             # If the result for the second value is more than 0.9 -> store a 
             # "green" array for this index
-            reshaped_img_array[pred[:,:,0] > 0.9] = [0, 240, 0]
+            reshaped_img_array[pred[:, :, 0] > 0.9] = [0, 240, 0]
             # Now, for each element in the picture, replace it or not
-            img_array[reshaped_img_array[:,:,1] == 240] = [0,240,0]
+            img_to_predict[reshaped_img_array[:, :, 1] == 240] = [0, 240, 0]
 
             # Create a new Image instance with the new_img_array array
-            new_img = Image.fromarray(img_array.astype('uint8'))
+            new_img = Image.fromarray(img_to_predict.astype('uint8'))
             # Finally, save this image
             new_img.save(basename(splitext(self.__filename)[0]) + "_segmented_img.jpg")
             # Save the unsegmented image

@@ -11,11 +11,14 @@ try:
     from keras.optimizers import Adam, RMSprop, SGD
     from tensorflow.nn import relu
 
+    import keras.backend as K
+
     import numpy as np
 
     from keras.models import model_from_json
 except ImportError as err:
     exit(err)
+
 
 class NNModel(object):
     """
@@ -184,17 +187,18 @@ class NNModel(object):
         # Load weights
         self._model.load_weights(weightsFileName)
 
-    def conv2d(self, inputs, filters, kernel_size=(3,3), action=None, pool_size=(2,2), up_size=(2,2)):
+    @staticmethod
+    def conv2d(inputs, filters, kernel_size=(3, 3), action=None, pool_size=(2, 2), up_size=(2, 2), concat_layer=None):
         """
         Creates and returns a layer with multiple convolution, dropout, up-sampling, max-pooling, etc layers.
 
         TODO: finish this method.
         """
-        if action=="upSampling":
+        if action == "upSampling":
             # MxN Up Sampling
             up     = UpSampling2D(up_size)(inputs)
             # Concatenation
-            concat = Concatenate(axis=3)([up, concatLayer])
+            concat = Concatenate(axis=3)([up, concat_layer])
             # MxN Convolution
             conv   = Conv2D(filters, kernel_size, padding='same', data_format='channels_last')(concat)
         else:
@@ -212,7 +216,7 @@ class NNModel(object):
         bn     = BatchNormalization()(conv)
         act    = Activation(relu)(bn)
 
-        if action=="maxPooling":
+        if action == "maxPooling":
             # MxN Max Pooling
             pool   = MaxPooling2D(pool_size=pool_size)(act)
 
@@ -221,8 +225,8 @@ class NNModel(object):
         """
         From: https://github.com/keras-team/keras/issues/3611 and https://github.com/keras-team/keras/issues/3611#issuecomment-243108708
         """
-        intersection = K.sum(y_true * y_pred, axis=[1,2,3])
-        union = K.sum(y_true, axis=[1,2,3]) + K.sum(y_pred, axis=[1,2,3])
+        intersection = K.sum(y_true * y_pred, axis=[1, 2, 3])
+        union = K.sum(y_true, axis=[1, 2, 3]) + K.sum(y_pred, axis=[1, 2, 3])
         return K.mean((2. * intersection + smooth)/(union + smooth), axis=0)
 
     @staticmethod
@@ -230,7 +234,7 @@ class NNModel(object):
         """
         From: https://github.com/keras-team/keras/issues/3611 and https://github.com/keras-team/keras/issues/3611#issuecomment-243108708
         """
-        return 1 - dice_coef(y_true, y_pred)
+        return 1 - NNModel._dice_coef(y_true, y_pred)
 
     @staticmethod
     def _soft_dice_loss(y_true, y_pred, epsilon=1e-6): 
@@ -253,13 +257,13 @@ class NNModel(object):
         
             Adapted from https://github.com/Lasagne/Recipes/issues/99#issuecomment-347775022
         """
-    
         # Skip the batch and class axis for calculating Dice score
         axes = tuple(range(1, len(y_pred.shape)-1)) 
         numerator = 2. * np.sum(y_pred * y_true, axes)
         denominator = np.sum(np.square(y_pred) + np.square(y_true), axes)
     
         return 1 - np.mean(numerator / (denominator + epsilon)) # Average over classes and batch
+
 
 if __name__ == "__main__":
     print("ERROR: this is not the main file of this program.")
