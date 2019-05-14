@@ -60,7 +60,7 @@ class RoadsModel(NNModel):
             "tiff"
         ]
 
-    def createLayers(self):
+    def create_layers(self):
         """
         Create each layer of the model.
         """
@@ -290,10 +290,10 @@ class RoadsModel(NNModel):
         acti10 = Activation(tf.nn.sigmoid, name='acti10_2')(bnor10)
 
         # Set a new model with the inputs and the outputs (tenth convolution)
-        self.setModel(Model(inputs=inputs, outputs=acti10))
+        self.set_model(Model(inputs=inputs, outputs=acti10))
 
         # Get a summary of the previously create model
-        self.getModel().summary()
+        self.get_model().summary()
 
     def learn(self):
         """

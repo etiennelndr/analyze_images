@@ -83,7 +83,7 @@ class ThreadCreateModel(QThread):
         """
         with tf_session.as_default():
             with tf_graph.as_default():
-                self.__mw.getModel().learn()
+                self.__mw.get_model().learn()
                 
                 self.threadDone.emit(True)
 
@@ -247,7 +247,7 @@ class MainWindow(QMainWindow):
         Appends text to the QTextEdit.
         """
         # If we're currently generating a new neural network model
-        if self.__model.isTraining():
+        if self.__model.is_training():
             txtSplit = text.split(" ")
             # Get the epoch and show it in the progress bar
             if txtSplit[0] == "Epoch":
@@ -270,7 +270,7 @@ class MainWindow(QMainWindow):
         # Set options
         options = QFileDialog.Options() # No option
         # Get file path
-        filenames, _ = QFileDialog.getOpenFileNames(self, "Open File", "", self.__model.concatenateExtensions(), options=options)
+        filenames, _ = QFileDialog.getOpenFileNames(self, "Open File", "", self.__model.concatenate_extensions(), options=options)
         # Create an empty list
         files = list()
         for filename in filenames:
@@ -301,7 +301,7 @@ class MainWindow(QMainWindow):
                 # Extract the name
                 self.__modelFilename = self.__modelFilename.split(".")[0]
                 # Open the model
-                self.__model.openModel(self.__modelFilename+".json", self.__modelFilename+".hdf5")
+                self.__model.open_model(self.__modelFilename + ".json", self.__modelFilename + ".hdf5")
                 # Allow the use of the model
                 self.__isModelLoaded = True
 
@@ -309,7 +309,7 @@ class MainWindow(QMainWindow):
                     filename = self.__modelFilename.split("/")[-1]
                     self.__ui.currentModel.setText(filename)
                     self.__data_to_process = filename.split("_")[0]
-                    self.__model.setDataToProcess(self.__data_to_process)
+                    self.__model.set_data_to_process(self.__data_to_process)
                 except IndexError:
                     self.__ui.currentModel.setText(self.__modelFilename)
             else:
@@ -323,7 +323,7 @@ class MainWindow(QMainWindow):
         # To avoid ValueError error we have to do a roolback of the model
         self.__model.rollback()
         # Create all layers
-        self.__model.createLayers()
+        self.__model.create_layers()
 
         # Compile, fit and evalute the model in a new thread
         self.__thread = ThreadCreateModel(self)
@@ -348,7 +348,7 @@ class MainWindow(QMainWindow):
         if ret:
             self.savedModelFilename = self.__data_to_process + datetime.now().strftime("_%d-%m-%y_%H-%M-%S")
             # Save the model with the given name
-            self.__model.saveModel(self.savedModelFilename)
+            self.__model.save_model(self.savedModelFilename)
             print("Model saved.")
 
             # Allow the use of the model
@@ -367,9 +367,9 @@ class MainWindow(QMainWindow):
         if self.__isModelLoaded:
             if len(self.__data_to_predict) != 0:
                 # Load these files in the model
-                self.__model.loadFilesToPredict(self.__data_to_predict)
+                self.__model.load_files_to_predict(self.__data_to_predict)
                 # Predict the output
-                pred = self.__model.predictOutput()
+                pred = self.__model.predict_output()
             else:
                 print("ERROR: please, open an image to predict.")
         else:
@@ -381,8 +381,8 @@ class MainWindow(QMainWindow):
         Plots model accuracy and loss.
         """
         # Random data
-        if self.__model is not None and self.__model.getHistory() is not None:
-            history = self.__model.getHistory()
+        if self.__model is not None and self.__model.get_history() is not None:
+            history = self.__model.get_history()
             print(history.history.keys())
             keys = list(history.history.keys())
             # Training accuracy and loss

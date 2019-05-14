@@ -38,7 +38,7 @@ class DigitsModel(NNModel):
             "tiff"
         ]
 
-    def createLayers(self):
+    def create_layers(self):
         """
         Creates each layer of the model.
         """
@@ -57,29 +57,29 @@ class DigitsModel(NNModel):
 
         # Add layers to the model
         # 3x3 Convolution
-        self.addLayer(Conv2D(36, kernel_size=(3,3), input_shape=self.input_shape))
-        self.addLayer(BatchNormalization())
-        self.addLayer(Activation(tf.nn.relu))
+        self.add_layer(Conv2D(36, kernel_size=(3, 3), input_shape=self.input_shape))
+        self.add_layer(BatchNormalization())
+        self.add_layer(Activation(tf.nn.relu))
         # Dropout of 0.2
-        self.addLayer(Dropout(0.2))
+        self.add_layer(Dropout(0.2))
         # 2x2 Max Pooling
-        self.addLayer(MaxPooling2D(pool_size=(2,2)))
+        self.add_layer(MaxPooling2D(pool_size=(2, 2)))
         # 3x3 Convolution
-        self.addLayer(Conv2D(28, kernel_size=(2,2)))
-        self.addLayer(BatchNormalization())
-        self.addLayer(Activation(tf.nn.relu))
+        self.add_layer(Conv2D(28, kernel_size=(2, 2)))
+        self.add_layer(BatchNormalization())
+        self.add_layer(Activation(tf.nn.relu))
          # 2x1 Max Pooling
-        self.addLayer(MaxPooling2D(pool_size=(2,1)))
-        self.addLayer(Flatten())
-        self.addLayer(Dense(128, activation=tf.nn.relu))
+        self.add_layer(MaxPooling2D(pool_size=(2, 1)))
+        self.add_layer(Flatten())
+        self.add_layer(Dense(128, activation=tf.nn.relu))
         # Dropout of 0.2
-        self.addLayer(Dropout(0.2))
-        self.addLayer(Dense(10, activation=tf.nn.softmax))
+        self.add_layer(Dropout(0.2))
+        self.add_layer(Dense(10, activation=tf.nn.softmax))
 
         self.datas = { "x_train" : x_train, "y_train" : y_train, "x_val" : x_val, "y_val" : y_val }
 
         # Print the model summary
-        self.getModel().summary()
+        self.get_model().summary()
 
     def learn(self):
         """

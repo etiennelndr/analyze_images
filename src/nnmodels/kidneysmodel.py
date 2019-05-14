@@ -32,11 +32,11 @@ class KidneysModel(NNModel):
             "hdr"
         ]
 
-    def createLayers(self):
+    def create_layers(self):
         """
         Creates each layer of the model.
         """
-        return super().createLayers()
+        return super().create_layers()
 
     def learn(self):
         """

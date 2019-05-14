@@ -45,9 +45,9 @@ class NNModel(object):
         # File extensions for data to predict
         self.FILE_EXTENSIONS  = list()
         # Initialize the main model
-        self.__initModel()
+        self.__init_model()
 
-    def __initModel(self):
+    def __init_model(self):
         """
         Initializes the main model.
         """
@@ -56,7 +56,7 @@ class NNModel(object):
 
         self._model = self._MODEL_TYPES[self._model_type]
 
-    def addLayer(self, layer):
+    def add_layer(self, layer):
         """
         Adds a new layer to a sequential model.
         """
@@ -66,34 +66,34 @@ class NNModel(object):
         """
         Re-initializes the model (~ rollback).
         """
-        self.__initModel()
+        self.__init_model()
 
     # Getters
-    def getModelType(self):
+    def get_model_type(self):
         """
         Returns model name.
         """
         return self._model_type
 
-    def getModel(self):
+    def get_model(self):
         """
         Returns an instance of the model.
         """
         return self._model
 
-    def setModel(self, model):
+    def set_model(self, model):
         """
         Sets a new value to the current model.
         """
         self._model = model
 
-    def getHistory(self):
+    def get_history(self):
         """
         Returns the history of model training.
         """
         return self._history
 
-    def isTraining(self):
+    def is_training(self):
         """
         Returns the training state of the model. It returns True if the model
         is currently training, otherwise False.
@@ -101,13 +101,13 @@ class NNModel(object):
         return self._training
 
     # Setters
-    def setDataToProcess(self, data_to_process):
+    def set_data_to_process(self, data_to_process):
         """
         Sets a new value to the type of data to process.
         """
         self._data_to_process = data_to_process
 
-    def concatenateExtensions(self):
+    def concatenate_extensions(self):
         """
         Concatenates all extensions in one sentence.
         """
@@ -119,7 +119,7 @@ class NNModel(object):
         return exts
 
     # Abstract methods
-    def createLayers(self):
+    def create_layers(self):
         """
         Creates each layer of the model.
         """
@@ -131,61 +131,61 @@ class NNModel(object):
         """
         raise NotImplementedError("Please implement this method.")
 
-    def predictOutput(self):
+    def predict_output(self):
         """
         Predicts an output for a given list of files/datas.
         """
         raise NotImplementedError("Please implement this method.")
 
-    def loadFilesToPredict(self, files):
+    def load_files_to_predict(self, files):
         """
         Loads files to predict.
         """
         self.filenames = files
 
-    def saveModel(self, basename="basename", dir="models"):
+    def save_model(self, basename="basename", dir="models"):
         """
         Saves a model.
         """
         if not exists(dir):
             makedirs(dir) # Create a new directory if it doesn't exist
 
-        architectureFilePath = basename + '.json'
-        print('\t - Architecture of the neural network: ' + architectureFilePath)
+        architecture_file_path = basename + '.json'
+        print('\t - Architecture of the neural network: ' + architecture_file_path)
 
-        with open(join(dir, architectureFilePath), 'wt') as json_file:
+        with open(join(dir, architecture_file_path), 'wt') as json_file:
             architecture = self._model.to_json()
             json_file.write(architecture)
 
-        weightsFilePath = join(dir, basename + '.hdf5')
-        print('\t - Weights of synaptic connections: ' + weightsFilePath)
-        self._model.save(weightsFilePath)
+        weights_file_path = join(dir, basename + '.hdf5')
+        print('\t - Weights of synaptic connections: ' + weights_file_path)
+        self._model.save(weights_file_path)
 
-    def openModel(self, architectureFileName, weightsFileName):
+    def open_model(self, architecture_file_name, weights_file_name):
         """
         Opens an existing model.
         """
-        if not exists(architectureFileName):
-            print("ERROR: " + architectureFileName + " doesn't exist.")
+        if not exists(architecture_file_name):
+            print("ERROR: " + architecture_file_name + " doesn't exist.")
             return
-        elif architectureFileName[-4:] != "json":
+        elif architecture_file_name[-4:] != "json":
             print("ERROR: architecture file extension MUST BE json.")
             return
         
-        if not exists(weightsFileName):
-            print("ERROR: " + weightsFileName + " doesn't exist.")
+        if not exists(weights_file_name):
+            print("ERROR: " + weights_file_name + " doesn't exist.")
             return
-        elif weightsFileName[-4:] != "hdf5":
+        elif weights_file_name[-4:] != "hdf5":
             print("ERROR: weights file extension MUST BE hdf5.")
             return
 
-        json_file = open(architectureFileName)
+        json_file = open(architecture_file_name)
         architecture = json_file.read()
         json_file.close()
         # Create a model from a json file
         self._model = model_from_json(architecture)
         # Load weights
-        self._model.load_weights(weightsFileName)
+        self._model.load_weights(weights_file_name)
 
     @staticmethod
     def conv2d(inputs, filters, kernel_size=(3, 3), action=None, pool_size=(2, 2), up_size=(2, 2), concat_layer=None):

@@ -41,7 +41,7 @@ class AnimalsModel(NNModel):
             "tiff"
         ]
 
-    def createLayers(self):
+    def create_layers(self):
         """
         Creates each layer of the model.
         """
@@ -86,20 +86,20 @@ class AnimalsModel(NNModel):
         self.datas = { "train_generator" : train_generator, "val_generator" : val_generator, "test_generator" : test_generator }
 
         # Add layers to the model
-        self.addLayer(Conv2D(32, (3, 3), activation=tf.nn.relu, input_shape=self.input_shape))
-        self.addLayer(MaxPooling2D((2, 2)))
-        self.addLayer(Conv2D(64, (3, 3), activation=tf.nn.relu))
-        self.addLayer(MaxPooling2D((2, 2)))
-        self.addLayer(Conv2D(128, (3, 3), activation=tf.nn.relu))
-        self.addLayer(MaxPooling2D((2, 2)))
-        self.addLayer(Conv2D(128, (3, 3), activation=tf.nn.relu))
-        self.addLayer(MaxPooling2D((2, 2)))
-        self.addLayer(Flatten())
-        self.addLayer(Dropout(0.5))
-        self.addLayer(Dense(512, activation=tf.nn.relu))
-        self.addLayer(Dense(1, activation=tf.nn.sigmoid))
+        self.add_layer(Conv2D(32, (3, 3), activation=tf.nn.relu, input_shape=self.input_shape))
+        self.add_layer(MaxPooling2D((2, 2)))
+        self.add_layer(Conv2D(64, (3, 3), activation=tf.nn.relu))
+        self.add_layer(MaxPooling2D((2, 2)))
+        self.add_layer(Conv2D(128, (3, 3), activation=tf.nn.relu))
+        self.add_layer(MaxPooling2D((2, 2)))
+        self.add_layer(Conv2D(128, (3, 3), activation=tf.nn.relu))
+        self.add_layer(MaxPooling2D((2, 2)))
+        self.add_layer(Flatten())
+        self.add_layer(Dropout(0.5))
+        self.add_layer(Dense(512, activation=tf.nn.relu))
+        self.add_layer(Dense(1, activation=tf.nn.sigmoid))
 
-        self.getModel().summary()
+        self.get_model().summary()
 
     def learn(self):
         """
