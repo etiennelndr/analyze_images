@@ -1,19 +1,25 @@
+"""
+Main window.
+"""
 try:
     import sys
     from datetime import datetime
 
-    from os.path import join
-    from os import makedirs
+    from os.path import join, basename, splitext
+    from os import makedirs, getpid
+    import psutil
 
     # Design
     from .design import Ui_MainWindow
 
     from PyQt5.QtWidgets import QMainWindow, QMessageBox, QFileDialog
     from PyQt5.QtGui import QTextCursor
-    from PyQt5.QtCore import pyqtSlot, pyqtSignal, QObject, QThread    
+    from PyQt5.QtCore import pyqtSlot, pyqtSignal, QObject, QThread
 
     import tensorflow as tf
     import numpy as np
+
+    import time
 
     # Plots
     import matplotlib.pyplot as plt
@@ -26,22 +32,22 @@ try:
     from keras import backend as K
 
     # In our case we're using the GPU which is faster than the CPU
-    GPU, CPU = True, False
+    GPU = True
 
     if GPU:
-        num_GPU = 1
         num_CPU = 1
-    if CPU:
+        num_GPU = 1
+    else:
         num_CPU = 1
         num_GPU = 0
     # Create a new Tensorflow configuration
     config = tf.ConfigProto(intra_op_parallelism_threads=0,
-                            inter_op_parallelism_threads=0, 
+                            inter_op_parallelism_threads=0,
                             allow_soft_placement=True,
-                            device_count = {'CPU' : num_CPU,
-                                            'GPU' : num_GPU},
+                            device_count={'CPU': num_CPU,
+                                          'GPU': num_GPU},
                             gpu_options=tf.GPUOptions(allow_growth=True)
-                           )
+                            )
     # Create a new session with this configuration
     session = tf.Session(config=config)
     # Set the Keras session with the one from Tensorflow
@@ -57,9 +63,10 @@ try:
 except ImportError as err:
     exit(err)
 
-#tf_session = K.get_session() # this creates a new session since one doesn't exist already.
+# tf_session = K.get_session() # this creates a new session since one doesn't exist already.
 tf_session = K.get_session()
 tf_graph = tf.get_default_graph()
+
 
 class ThreadCreateModel(QThread):
     """
@@ -67,10 +74,12 @@ class ThreadCreateModel(QThread):
     """
     threadDone = pyqtSignal(bool)
 
-    def __init__(self, mw):
+    def __init__(self, mw, action="create_model"):
         super().__init__()
         # Main window instance
         self.__mw = mw
+
+        self.action = action
 
         self.threadDone.connect(self.__mw.done)
 
@@ -81,10 +90,19 @@ class ThreadCreateModel(QThread):
         """
         Main function -> it runs the current thread until its work is done.
         """
+        if self.action == "create_model":
+            self.create_model()
+        else:
+            raise ValueError("ERROR: {} is an unknown action.".format(self.action))
+
+    def create_model(self):
+        """
+        Creates one model.
+        """
         with tf_session.as_default():
             with tf_graph.as_default():
                 self.__mw.get_model().learn()
-                
+
                 self.threadDone.emit(True)
 
     def stop(self):
@@ -94,6 +112,7 @@ class ThreadCreateModel(QThread):
         self.terminate()
         self.threadDone.emit(False)
 
+
 class EmittingStream(QObject):
     """
     TODO: documentation.
@@ -101,6 +120,11 @@ class EmittingStream(QObject):
     textWritten = pyqtSignal(str)
 
     def write(self, text):
+        """
+        Emits a text to write.
+
+        :param text: the text to write
+        """
         self.textWritten.emit(str(text))
 
     def flush(self):
@@ -109,8 +133,11 @@ class EmittingStream(QObject):
         """
         pass
 
+
 class MainWindow(QMainWindow):
-    """description of class"""
+    """
+    Main window using PyQt5 library.
+    """
 
     def __init__(self, x, y, title="Main Window"):
         """
@@ -118,22 +145,27 @@ class MainWindow(QMainWindow):
         """
         super().__init__()
 
+        # Title
+        self.setWindowTitle(title)
+
         # Window size
         self.__x, self.__y, = x, y
-        # Title
-        self.__tile = title
+        # Default data to process
+        self.__data_to_process = "roads"
+        # Inform the program that it is able to train a new neural network or not
+        self.__is_training_enabled = True
+        # Create a variable to prevent the use of an uninitialized model
+        self.__is_model_loaded = False
+        # Default model
+        self.DefaultModel = AerialBuildingsModel
 
-        # File for MRI loading
-        self.__MRIfilename = None
-        # File for model loading
-        self.__modelFilename = None
-
-        self.__data_to_process = "digits"
+        # Install the custom output stream
+        sys.stdout = EmittingStream(textWritten=self.normal_output_written)
 
         # Initialize the model
-        self.__initModel()
+        self.__init_model()
         # Initialize the main UI
-        self.__initUI()
+        self.__init_ui()
 
     def __del__(self):
         """
@@ -142,23 +174,21 @@ class MainWindow(QMainWindow):
         # Restore sys.stdout
         sys.stdout = sys.__stdout__
 
-    def getModel(self):
+    def get_model(self):
         """
         Returns an instance of the current model.
         """
-        return self.__model
+        return self.model
 
-    def __initModel(self):
+    def __init_model(self):
         with tf_session.as_default():
             with tf_graph.as_default():
                 # Create a variable for neural network model
-                self.__model = DigitsModel()
-                # Create a variable to prevent the use of an uninitialized model
-                self.__isModelLoaded = False
+                self.model = self.DefaultModel()
                 # The data to predict
                 self.__data_to_predict = list()
 
-    def __initUI(self):
+    def __init_ui(self):
         """
         Initialization of the main window UI.
         """
@@ -166,13 +196,13 @@ class MainWindow(QMainWindow):
         self.__ui = Ui_MainWindow()
         self.__ui.setupUi(self)
         # Create plots
-        self.__createPlots()
+        self.__create_plots()
         # Create connections
-        self.__createConnections()
+        self.__create_connections()
         # Show main window
         self.show()
 
-    def __createPlots(self):
+    def __create_plots(self):
         """
         Creates plots to show model learning performance.
         """
@@ -190,91 +220,84 @@ class MainWindow(QMainWindow):
         self.__ui.plotLayout.addWidget(self.__toolbar)
         self.__ui.plotLayout.addWidget(self.__canvas)
 
-    def __createConnections(self):
+    def __create_connections(self):
         """
         Creates connections between actions/buttons/etc and methods.
         """
         # Actions
         self.__ui.exitAct.triggered.connect(self.close)
-        self.__ui.openAct.triggered.connect(self.openFile)
+        self.__ui.openAct.triggered.connect(self.btn_open_file)
         # Buttons
-        self.__ui.createModelBtn.clicked.connect(self.createModel)
-        self.__ui.openModelBtn.clicked.connect(self.openModel)
-        self.__ui.predictValueBtn.clicked.connect(self.predictValue)
-        self.__ui.plotBtn.clicked.connect(self.plot)
+        self.__ui.createModelBtn.clicked.connect(self.btn_create_model)
+        self.__ui.openModelBtn.clicked.connect(self.btn_open_model)
+        self.__ui.predictValueBtn.clicked.connect(self.btn_predict_value)
+        self.__ui.plotBtn.clicked.connect(self.btn_plot)
         # Radio buttons
-        self.__ui.roadsRadioBtn.clicked.connect(lambda: self.setModel("roads"))
-        self.__ui.digitsRadioBtn.clicked.connect(lambda: self.setModel("digits"))
-        self.__ui.animalsRadioBtn.clicked.connect(lambda: self.setModel("animals"))
-        self.__ui.aerialBuildingsRadioBtn.clicked.connect(lambda: self.setModel("aerial_buildings"))
-        self.__ui.aerialRoadsRadioBtn.clicked.connect(lambda: self.setModel("aerial_roads"))
-        self.__ui.kidneysRadioBtn.clicked.connect(lambda: self.setModel("kidneys"))
-        # Console check box
-        self.__ui.useConsoleCheckBox.stateChanged.connect(lambda: self.useConsole(self.__ui.useConsoleCheckBox))
- 
+        self.__ui.roadsRadioBtn.clicked.connect(lambda: self.set_model("roads"))
+        self.__ui.digitsRadioBtn.clicked.connect(lambda: self.set_model("digits"))
+        self.__ui.animalsRadioBtn.clicked.connect(lambda: self.set_model("animals"))
+        self.__ui.aerialBuildingsRadioBtn.clicked.connect(lambda: self.set_model("aerial_buildings"))
+        self.__ui.aerialRoadsRadioBtn.clicked.connect(lambda: self.set_model("aerial_roads"))
+        self.__ui.kidneysRadioBtn.clicked.connect(lambda: self.set_model("kidneys"))
+
     def closeEvent(self, event):
         """
         Before closing the main window we ask user agreement.
         """
-        reply = QMessageBox.question(self, 
-                "Message",
-                "Are you sure you want to quit ?",
-                QMessageBox.Yes,
-                QMessageBox.No)
+        reply = QMessageBox.question(self,
+                                     "Message",
+                                     "Are you sure you want to quit ?",
+                                     QMessageBox.Yes,
+                                     QMessageBox.No)
 
         if reply == QMessageBox.Yes:
             event.accept()
         else:
             event.ignore()
 
-    @pyqtSlot()
-    def useConsole(self, checkBox):
-        """
-        Gives two choices to the user:
-            - use the EmittingStream class to print in a QTextEdit
-            - use the default sys.__stdout__ ouput
-        """
-        if checkBox.isChecked():
-            # Install the custom output stream
-            sys.stdout = EmittingStream(textWritten = self.normalOutputWritten) 
-        else:
-            # Restore sys.stdout
-            sys.stdout = sys.__stdout__
-
     @pyqtSlot(str)
-    def normalOutputWritten(self, text):
+    def normal_output_written(self, text):
         """
         Appends text to the QTextEdit.
         """
         # If we're currently generating a new neural network model
-        if self.__model.is_training():
-            txtSplit = text.split(" ")
+        if self.model.is_training():
+            txt_split = text.split(" ")
             # Get the epoch and show it in the progress bar
-            if txtSplit[0] == "Epoch":
-                step        = txtSplit[1].split("/")
+            if txt_split[0] == "Epoch":
+                step = txt_split[1].split("/")
                 actual_step = step[0]
-                max_step    = step[1]
-                self.__ui.progressBar.setValue(((int(actual_step)/int(max_step))*100) % 101) # Modulo 101 -> [0;100] and not [0;100[
+                max_step = step[1]
+                self.__ui.progressBar.setValue(
+                    ((int(actual_step) / int(max_step)) * 100) % 101)  # Modulo 101 -> [0;100] and not [0;100[
 
-        cursor = self.__ui.textEdit.textCursor()
-        cursor.movePosition(QTextCursor.End)
-        cursor.insertText(text)
-        self.__ui.textEdit.setTextCursor(cursor)
-        self.__ui.textEdit.ensureCursorVisible()
-    
+        if self.__ui.loggerCheckBox.isChecked() and any(t in text for t in ("val_loss", "Epoch")):
+            self.model.logfile.write(text)
+            self.model.logfile.flush()
+
+        if self.__ui.useConsoleCheckBox.isChecked():
+            cursor = self.__ui.textEdit.textCursor()
+            cursor.movePosition(QTextCursor.End)
+            cursor.insertText(text)
+            self.__ui.textEdit.setTextCursor(cursor)
+            self.__ui.textEdit.ensureCursorVisible()
+        else:
+            print(text, file=sys.__stdout__)
+
     @pyqtSlot()
-    def openFile(self):
+    def btn_open_file(self):
         """
         Opens a list of files.
         """
         # Set options
-        options = QFileDialog.Options() # No option
+        options = QFileDialog.Options()  # No option
         # Get file path
-        filenames, _ = QFileDialog.getOpenFileNames(self, "Open File", "", self.__model.concatenate_extensions(), options=options)
+        filenames, _ = QFileDialog.getOpenFileNames(self, "Open File", "", self.model.concatenate_extensions(),
+                                                    options=options)
         # Create an empty list
         files = list()
         for filename in filenames:
-            if filename.endswith(tuple(self.__model.FILE_EXTENSIONS)):
+            if filename.endswith(tuple(self.model.FILE_EXTENSIONS)):
                 # Add this file in the files to process
                 files.append(filename)
             else:
@@ -287,109 +310,117 @@ class MainWindow(QMainWindow):
             self.__data_to_predict = files
 
     @pyqtSlot()
-    def openModel(self):
+    def btn_open_model(self):
         """
         Opens an existing model.
         """
         # Set options
         options = QFileDialog.Options()
         # Get file path
-        self.__modelFilename, _ = QFileDialog.getOpenFileName(self, "Open Architecture File", "","JSON Files (*.json);;HDF5 Files (*.hdf5);;All Files (*)", options=options)
+        model_filename, _ = QFileDialog.getOpenFileName(self,
+                                                        "Open Architecture File",
+                                                        "",
+                                                        "JSON Files (*.json);;HDF5 Files (*.hdf5);;All Files (*)",
+                                                        options=options)
         # Avoid empty file name
-        if len(self.__modelFilename) != 0:
-            if self.__modelFilename.endswith(tuple(["json", "hdf5"])):
-                # Extract the name
-                self.__modelFilename = self.__modelFilename.split(".")[0]
-                # Open the model
-                self.__model.open_model(self.__modelFilename + ".json", self.__modelFilename + ".hdf5")
-                # Allow the use of the model
-                self.__isModelLoaded = True
-
+        if len(model_filename) != 0:
+            if model_filename.endswith(tuple(["json", "hdf5"])):
                 try:
-                    filename = self.__modelFilename.split("/")[-1]
-                    self.__ui.currentModel.setText(filename)
-                    self.__data_to_process = filename.split("_")[0]
-                    self.__model.set_data_to_process(self.__data_to_process)
-                except IndexError:
-                    self.__ui.currentModel.setText(self.__modelFilename)
+                    # Get the type of the model from its filename
+                    self.model = available_models[splitext(basename(model_filename))[0].split("_")[1]]
+
+                    # Extract the name
+                    model_filename = model_filename.split(".")[0]
+                    # Open the model
+                    self.model.open_model(model_filename + ".json", model_filename + ".hdf5")
+                    # Allow the use of the model
+                    self.__is_model_loaded = True
+
+                    try:
+                        filename = basename(model_filename)
+                        self.__ui.currentModel.setText(filename)
+                        self.__data_to_process = filename.split("_")[0]
+                        self.model.set_data_to_process(self.__data_to_process)
+                    except IndexError:
+                        self.__ui.currentModel.setText(model_filename)
+                except KeyError:
+                    print("ERROR: unknown model -> {}".format(splitext(basename(model_filename))[0].split("_")[1]))
             else:
                 print("ERROR: wrong file extension.")
-    
+
     @pyqtSlot()
-    def createModel(self):
+    def btn_create_model(self):
         """
         Creates a NN model.
         """
-        # To avoid ValueError error we have to do a roolback of the model
-        self.__model.rollback()
+        if not self.__is_training_enabled:
+            return
+
+        if len([p.info for p in psutil.process_iter(attrs=['pid', 'name']) if 'python' in p.info['name']]) != 1:
+            print("Hold on, wait a little buddy...", end=' ', flush=True)
+            # Wait during 4 hours
+            time.sleep(60 * 60 * 4)
+            print("Let's go!")
+            print("First of all, kill the previous python processes...", end=' ', flush=True)
+            # Get my own pid
+            my_pid = getpid()
+            # Get all python processes
+            py_processes = [p.info for p in psutil.process_iter(attrs=['pid', 'name']) if 'python' in p.info['name']]
+            for process in py_processes:
+                if process['pid'] != my_pid:
+                    p = psutil.Process(process['pid'])
+                    p.kill()
+            time.sleep(60)
+            print("OK, let's train!")
+
+        # To avoid ValueError error we have to do a rollback of the model
+        self.model.rollback()
         # Create all layers
-        self.__model.create_layers()
+        self.model.create_layers()
 
-        # Compile, fit and evalute the model in a new thread
-        self.__thread = ThreadCreateModel(self)
-        self.__thread.setTerminationEnabled(True)
+        # Compile, fit and evaluate the model in a new thread
+        self.thread = ThreadCreateModel(self)
+        self.thread.setTerminationEnabled()
         # Start the thread
-        self.__thread.start()
-
-        #self.__ui.stopModelCreationBtn.setEnabled(True)
-        #if not self.__isStopModelCreationBtnConnected:
+        self.thread.start()
+        # self.__ui.stopModelCreationBtn.setEnabled(True)
+        # if not self.__isStopModelCreationBtnConnected:
         #    self.__ui.stopModelCreationBtn.clicked.connect(self.__thread.stop)
         #    self.__isStopModelCreationBtnConnected = True
 
-    @pyqtSlot(bool)
-    def done(self, ret):
-        """
-        Inform the user of the end of the model training.
-        """
-        self.__ui.progressBar.setValue(0)
-
-        #self.__ui.stopModelCreationBtn.setEnabled(False)
-
-        if ret:
-            self.savedModelFilename = self.__data_to_process + datetime.now().strftime("_%d-%m-%y_%H-%M-%S")
-            # Save the model with the given name
-            self.__model.save_model(self.savedModelFilename)
-            print("Model saved.")
-
-            # Allow the use of the model
-            self.__isModelLoaded = True
-
-            self.__ui.currentModel.setText(self.savedModelFilename)
-
-        print("DONE")
-
     @pyqtSlot()
-    def predictValue(self):
+    def btn_predict_value(self):
         """
-        Predict segmentation or classification of a specific image. Before calling this
-        method you have to load an image with the method MainWindow.openFile().
+        Predicts the segmentation of a list of images. Before
+        calling this method you have to load at least one image
+        with the method MainWindow.openFile().
         """
-        if self.__isModelLoaded:
+        if self.__is_model_loaded:
             if len(self.__data_to_predict) != 0:
                 # Load these files in the model
-                self.__model.load_files_to_predict(self.__data_to_predict)
+                self.model.load_files_to_predict(self.__data_to_predict)
                 # Predict the output
-                pred = self.__model.predict_output()
+                self.model.predict_output()
             else:
                 print("ERROR: please, open an image to predict.")
         else:
             print("ERROR: please, create or open a model.")
 
     @pyqtSlot()
-    def plot(self):
+    def btn_plot(self):
         """
         Plots model accuracy and loss.
         """
         # Random data
-        if self.__model is not None and self.__model.get_history() is not None:
-            history = self.__model.get_history()
+        if self.model is not None and self.model.get_history() is not None:
+            history = self.model.get_history()
             print(history.history.keys())
             keys = list(history.history.keys())
             # Training accuracy and loss
-            x_acc      = history.history[keys[3]]
-            x_loss     = history.history[keys[2]]
+            x_acc = history.history[keys[3]]
+            x_loss = history.history[keys[2]]
             # Validation accuracy and loss
-            x_val_acc  = history.history[keys[1]]
+            x_val_acc = history.history[keys[1]]
             x_val_loss = history.history[keys[0]]
 
             # Instead of ax.hold(False)
@@ -400,8 +431,8 @@ class MainWindow(QMainWindow):
 
             # Plot datas
             # Accuracy
-            trainLegend, = ax1.plot(x_acc, label="training accuracy")
-            valLegend,   = ax1.plot(x_val_acc, label="validation accuracy")
+            train_legend, = ax1.plot(x_acc, label="training accuracy")
+            val_legend, = ax1.plot(x_val_acc, label="validation accuracy")
             ax1.set_xlabel("epoch")
             ax1.set_ylabel("accuracy")
             ax1.set_title("Training and validation accuracy")
@@ -413,38 +444,49 @@ class MainWindow(QMainWindow):
             ax2.set_title("Training and validation loss")
 
             # Legend
-            self.__figure.legend(handles=(trainLegend, valLegend), labels=('training','validation'), loc='best')
+            self.__figure.legend(handles=(train_legend, val_legend), labels=('training', 'validation'), loc='best')
 
             # Create a new directory if it doesn't exist
-            dir = "models/figures"
-            makedirs(dir, exist_ok=True)
+            folder = "models/figures"
+            makedirs(folder, exist_ok=True)
             # Save the figure
-            filename = self.savedModelFilename + ".png"
-            self.__figure.savefig(join(dir, filename))
+            filename = self.saved_model_filename + ".png"
+            self.__figure.savefig(join(folder, filename))
 
             # Refresh canvas
             self.__canvas.draw()
         else:
             print("WARNING: nothing to plot (model and/or model.history is/are None).")
 
+    @pyqtSlot(bool)
+    def done(self, ret):
+        """
+        Informs the user of the end of the model training.
+        """
+        self.__ui.progressBar.setValue(0)
+
+        if ret:
+            self.saved_model_filename = "{}_{}".format(self.__data_to_process, self.get_model().model_name) + datetime.now().strftime("_%d-%m-%y_%H-%M-%S")
+            # Save the model with the given name
+            self.model.save_model(self.saved_model_filename)
+            print("Model saved.")
+
+            # Allow the use of the model
+            self.__is_model_loaded = True
+
+            self.__ui.currentModel.setText(self.saved_model_filename)
+
+        print("DONE")
+
     @pyqtSlot(str)
-    def setModel(self, radioBtn):
+    def set_model(self, radio_btn):
         """
         Thanks to the selected radio button, instantiate a new neural network model.
         """
-        self.__data_to_process = radioBtn
-        if radioBtn == "roads":
-            self.__model = RoadsModel()
-        elif radioBtn == "digits":
-            self.__model = DigitsModel()
-        elif radioBtn == "animals":
-            self.__model = AnimalsModel()
-        elif radioBtn == "aerial_buildings":
-            self.__model = AerialBuildingsModel()
-        elif radioBtn == "aerial_roads":
-            self.__model = AerialRoadsModel()
-        elif radioBtn == "kidneys":
-            self.__model = KidneysModel()
+        self.__data_to_process = radio_btn
+        if radio_btn == "roads":
+            self.model = self.DefaultModel()
+
 
 if __name__ == "__main__":
     print("ERROR: this is not the main file of this program.")

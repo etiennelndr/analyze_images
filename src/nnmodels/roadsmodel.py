@@ -27,9 +27,10 @@ try:
 
     import numpy as np
 
-    from preprocessing.image import transfromXY
+    from utils import transfromXY
 except ImportError as err:
     exit(err)
+
 
 class RoadsModel(NNModel):
     """
@@ -43,7 +44,7 @@ class RoadsModel(NNModel):
         """
         Initialization of the model.
         """
-        super().__init__("model", "roads")
+        super().__init__("model", "roads", model_name=self.__class__.__name__.lower())
 
         # Number of classes to segment
         # 0 -> not a road

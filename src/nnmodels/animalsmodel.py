@@ -16,6 +16,7 @@ try:
 except ImportError as err:
     exit(err)
 
+
 class AnimalsModel(NNModel):
     """
     Neural network model for animal classification.
@@ -28,7 +29,7 @@ class AnimalsModel(NNModel):
         """
         Initialization of the model.
         """
-        super().__init__('sequential', 'animals')
+        super().__init__('sequential', 'animals', model_name=self.__class__.__name__.lower())
 
         # Input data shape
         self.input_shape = (150, 150, 3)

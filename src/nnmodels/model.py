@@ -32,7 +32,7 @@ class NNModel(object):
     }
 
     # Constructor
-    def __init__(self, model_type="sequential", data_to_process="digits"):
+    def __init__(self, model_type="sequential", data_to_process="digits", model_name="aerialbuildingsmodel"):
         """
         Initialization of the model.
         """
@@ -42,8 +42,12 @@ class NNModel(object):
         self._history         = None
         # Training state is set to False
         self._training        = False
+        # Model name
+        self.model_name = model_name
         # File extensions for data to predict
         self.FILE_EXTENSIONS  = list()
+        # Log file
+        self.logfile = None
         # Initialize the main model
         self.__init_model()
 
@@ -112,11 +116,17 @@ class NNModel(object):
         Concatenates all extensions in one sentence.
         """
         exts = ""
-        for i in range(len(self.FILE_EXTENSIONS)):
-            ext = self.FILE_EXTENSIONS[i]
+        for ext in self.FILE_EXTENSIONS:
             exts += "{} Files (*.{});;".format(ext.upper(), ext)
         exts += "All Files (*)"
         return exts
+
+    def create_logfile(self):
+        """
+        Creates a log file for this model.
+        """
+        self.logfile = open("{}_{}".format(self._data_to_process, self.model_name) + datetime.now().strftime(
+            "_%d-%m-%y_%H-%M-%S") + ".txt", "w+")
 
     # Abstract methods
     def create_layers(self):
@@ -143,21 +153,21 @@ class NNModel(object):
         """
         self.filenames = files
 
-    def save_model(self, basename="basename", dir="models"):
+    def save_model(self, basename="basename", folder="models"):
         """
         Saves a model.
         """
-        if not exists(dir):
-            makedirs(dir) # Create a new directory if it doesn't exist
+        if not exists(folder):
+            makedirs(folder) # Create a new directory if it doesn't exist
 
         architecture_file_path = basename + '.json'
         print('\t - Architecture of the neural network: ' + architecture_file_path)
 
-        with open(join(dir, architecture_file_path), 'wt') as json_file:
+        with open(join(folder, architecture_file_path), 'wt') as json_file:
             architecture = self._model.to_json()
             json_file.write(architecture)
 
-        weights_file_path = join(dir, basename + '.hdf5')
+        weights_file_path = join(folder, basename + '.hdf5')
         print('\t - Weights of synaptic connections: ' + weights_file_path)
         self._model.save(weights_file_path)
 
@@ -218,51 +228,9 @@ class NNModel(object):
 
         if action == "maxPooling":
             # MxN Max Pooling
-            pool   = MaxPooling2D(pool_size=pool_size)(act)
+            act   = MaxPooling2D(pool_size=pool_size)(act)
 
-    @staticmethod
-    def _dice_coef(y_true, y_pred, smooth=1):
-        """
-        From: https://github.com/keras-team/keras/issues/3611 and https://github.com/keras-team/keras/issues/3611#issuecomment-243108708
-        """
-        intersection = K.sum(y_true * y_pred, axis=[1, 2, 3])
-        union = K.sum(y_true, axis=[1, 2, 3]) + K.sum(y_pred, axis=[1, 2, 3])
-        return K.mean((2. * intersection + smooth)/(union + smooth), axis=0)
-
-    @staticmethod
-    def _dice_coef_loss(y_true, y_pred):
-        """
-        From: https://github.com/keras-team/keras/issues/3611 and https://github.com/keras-team/keras/issues/3611#issuecomment-243108708
-        """
-        return 1 - NNModel._dice_coef(y_true, y_pred)
-
-    @staticmethod
-    def _soft_dice_loss(y_true, y_pred, epsilon=1e-6): 
-        """
-        From: https://gist.github.com/jeremyjordan/9ea3032a32909f71dd2ab35fe3bacc08
-
-        Soft dice loss calculation for arbitrary batch size, number of classes, and number of spatial dimensions.
-        Assumes the `channels_last` format.
-  
-        # Arguments
-            y_true: b x X x Y( x Z...) x c One hot encoding of ground truth
-            y_pred: b x X x Y( x Z...) x c Network output, must sum to 1 over c channel (such as after softmax) 
-            epsilon: Used for numerical stability to avoid divide by zero errors
-    
-        # References
-            V-Net: Fully Convolutional Neural Networks for Volumetric Medical Image Segmentation 
-            https://arxiv.org/abs/1606.04797
-            More details on Dice loss formulation 
-            https://mediatum.ub.tum.de/doc/1395260/1395260.pdf (page 72)
-        
-            Adapted from https://github.com/Lasagne/Recipes/issues/99#issuecomment-347775022
-        """
-        # Skip the batch and class axis for calculating Dice score
-        axes = tuple(range(1, len(y_pred.shape)-1)) 
-        numerator = 2. * np.sum(y_pred * y_true, axes)
-        denominator = np.sum(np.square(y_pred) + np.square(y_true), axes)
-    
-        return 1 - np.mean(numerator / (denominator + epsilon)) # Average over classes and batch
+        return act
 
 
 if __name__ == "__main__":

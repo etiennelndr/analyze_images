@@ -6,10 +6,14 @@ try:
 except ImportError as err:
     exit(err)
 
+
 def main():
     app = QApplication(sys.argv)
-    myWindow = MainWindow(950, 750)
+    app.setApplicationName("Analyze images")
+    my_window = MainWindow(950, 750)
+    app.setActiveWindow(my_window)
     exit(app.exec_())
+
 
 if __name__ == "__main__":
     main()
