@@ -22,7 +22,7 @@ Before using this repository you must install these programs and libraries:
 - [Keras](https://keras.io/) >= 2.2.4
 - [matplotlib](https://matplotlib.org/) >= 3.0.2
 - [numpy](http://www.numpy.org/) >= 1.14.5
-- [Pillow](https://pillow.readthedocs.io/en/stable/) >= 6.2.0
+- [Pillow](https://pillow.readthedocs.io/en/stable/) >= 6.2.2
 - [pydot](https://pypi.org/project/pydot/) >= 2.4.1
 - [PyQt5](https://pypi.org/project/PyQt5/) >= 5.11.3
 - [scikit-image](https://scikit-image.org/) >= 0.14.2
